@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Flame, KeyRound } from "lucide-react";
+import { RouteError } from "@/components/app/RouteError";
 import { Button } from "@/components/kit/Button";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/state/authContext";
@@ -16,6 +17,7 @@ export const Route = createFileRoute("/reset-password")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
+  errorComponent: RouteError,
   errorComponent: RouteError,
   component: ResetPasswordPage,
 });
