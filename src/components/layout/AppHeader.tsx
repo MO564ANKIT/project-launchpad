@@ -9,12 +9,12 @@ import { computeStreak } from "@/lib/progress";
 
 function Logo() {
   return (
-    <div className="flex items-center gap-3">
-      <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-neon-400/50 bg-night-900 shadow-glow-neon">
+    <div className="flex items-center gap-2 sm:gap-3">
+      <div className="flex h-9 w-9 sm:h-11 sm:w-11 items-center justify-center rounded-xl border border-neon-400/50 bg-night-900 shadow-glow-neon">
         <Flame className="h-5 w-5 text-neon-300" strokeWidth={2.25} />
       </div>
       <div className="leading-none">
-        <p className="font-display text-xl font-bold uppercase tracking-[0.18em] text-ink-50">
+        <p className="font-display text-base font-bold uppercase tracking-[0.12em] sm:text-xl sm:tracking-[0.18em] text-ink-50">
           Spendemon
         </p>
         <p className="mt-1 hidden text-[11px] uppercase tracking-widest text-ink-400 sm:block">
@@ -35,7 +35,7 @@ export function AppHeader({ onNavigate }: AppHeaderProps) {
 
   return (
     <header className="sticky top-0 z-30 border-b border-neon-400/15 bg-night-950/85 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 sm:gap-3 sm:px-4 py-3 sm:px-6">
         <button
           type="button"
           onClick={() => onNavigate("dashboard")}
@@ -43,7 +43,7 @@ export function AppHeader({ onNavigate }: AppHeaderProps) {
         >
           <Logo />
         </button>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <StreakChip streak={streak} />
           <DataMenu state={state} />
           <SignOutButton />
