@@ -4,6 +4,7 @@ import { Button } from '@/components/kit/Button';
 import { Toast } from '@/components/kit/Toast';
 import { EmptyState } from '@/components/kit/EmptyState';
 import { SandboxBadge } from '@/components/checkout/SandboxBadge';
+import { SetupNotice } from '@/components/checkout/SetupNotice';
 import { MonsterImage } from '@/components/monsters/MonsterImage';
 import { PurchaseGuardian } from '@/components/shop/PurchaseGuardian';
 import { ITEM_TYPE_LABEL, LOOT_BY_ID, LOOT_CATALOGUE, RARITY_CLASS, SHOP_ITEMS, type ItemType, type LootItem } from '@/lib/lootCatalogue';
@@ -59,6 +60,8 @@ export function LootShopPage() {
           Cosmetic items only, priced in US dollars. Every checkout is checked by the AI Purchase Guardian first and runs in PayPal Sandbox, so no real money moves. Items unlock only after PayPal confirms the payment.
         </p>
       </header>
+
+      <SetupNotice />
 
       <div className="flex flex-wrap gap-2" role="group" aria-label="Filter by item type">
         {TYPE_FILTERS.map((type) => (
