@@ -14,7 +14,10 @@ const CATEGORY_LABELS: Record<string, { label: string; roastable: boolean }> = {
 const CATEGORY_KEYWORDS: { pattern: RegExp; category: string }[] = [
   { pattern: /coffee|cafe|latte|chai|cold brew|tea/i, category: "coffee" },
   { pattern: /food|swiggy|zomato|pizza|burger|dinner|lunch|snack|meal|takeout/i, category: "food" },
-  { pattern: /netflix|spotify|prime|subscription|ott|membership|youtube/i, category: "subscriptions" },
+  {
+    pattern: /netflix|spotify|prime|subscription|ott|membership|youtube/i,
+    category: "subscriptions",
+  },
   { pattern: /game|movie|concert|ticket|party|arcade|fun/i, category: "fun" },
   { pattern: /rent|bill|electric|water|internet|phone plan/i, category: "bills" },
 ];
@@ -22,7 +25,11 @@ const CATEGORY_KEYWORDS: { pattern: RegExp; category: string }[] = [
 const MAX_AMOUNT_PAISE = 1_000_000_000;
 const TIGHT_THRESHOLD_RATIO = 0.1;
 const DATE_KEY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
-const moneyFormatter = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 2 });
+const moneyFormatter = new Intl.NumberFormat("en-IN", {
+  style: "currency",
+  currency: "INR",
+  maximumFractionDigits: 2,
+});
 
 interface SavedExpense {
   amountPaise: number;
@@ -42,7 +49,9 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function isPaise(value: unknown): value is number {
-  return typeof value === "number" && Number.isInteger(value) && value > 0 && value <= MAX_AMOUNT_PAISE;
+  return (
+    typeof value === "number" && Number.isInteger(value) && value > 0 && value <= MAX_AMOUNT_PAISE
+  );
 }
 
 function isSavedExpense(value: unknown): value is SavedExpense {
@@ -61,11 +70,14 @@ export function readSavedBudgetState(value: unknown): SavedBudgetState | null {
   const budgets = isRecord(value.categoryBudgetsPaise) ? value.categoryBudgetsPaise : {};
   const expenses = Array.isArray(value.expenses) ? value.expenses.filter(isSavedExpense) : [];
   const events = Array.isArray(value.events)
-    ? value.events.filter((event): event is { at: string } => isRecord(event) && typeof event.at === "string")
+    ? value.events.filter(
+        (event): event is { at: string } => isRecord(event) && typeof event.at === "string",
+      )
     : [];
   const categoryBudgetsPaise: Record<string, number> = {};
   for (const [category, amount] of Object.entries(budgets)) {
-    if (Object.hasOwn(CATEGORY_LABELS, category) && isPaise(amount)) categoryBudgetsPaise[category] = amount;
+    if (Object.hasOwn(CATEGORY_LABELS, category) && isPaise(amount))
+      categoryBudgetsPaise[category] = amount;
   }
   return {
     monthlyBudgetPaise: isPaise(value.monthlyBudgetPaise) ? value.monthlyBudgetPaise : null,
@@ -118,13 +130,18 @@ function verdictText(verdict: string): string {
   }
 }
 
-export function buildBudgetFacts(state: SavedBudgetState, message: string, today: string): string[] {
+export function buildBudgetFacts(
+  state: SavedBudgetState,
+  message: string,
+  today: string,
+): string[] {
   const month = today.slice(0, 7);
   const monthExpenses = state.expenses.filter((expense) => expense.date.slice(0, 7) === month);
   const spentPaise = monthExpenses.reduce((sum, expense) => sum + expense.amountPaise, 0);
   const spentByCategory: Record<string, number> = {};
   for (const expense of monthExpenses) {
-    spentByCategory[expense.category] = (spentByCategory[expense.category] ?? 0) + expense.amountPaise;
+    spentByCategory[expense.category] =
+      (spentByCategory[expense.category] ?? 0) + expense.amountPaise;
   }
   const budget = state.monthlyBudgetPaise;
   const remaining = budget === null ? null : budget - spentPaise;
@@ -132,9 +149,11 @@ export function buildBudgetFacts(state: SavedBudgetState, message: string, today
   const facts: string[] = [];
 
   if (remaining === null) facts.push("No monthly budget is set.");
-  else if (remaining < 0) facts.push(`Over this month's budget by ${moneyFormatter.format(Math.abs(remaining) / 100)}.`);
+  else if (remaining < 0)
+    facts.push(`Over this month's budget by ${moneyFormatter.format(Math.abs(remaining) / 100)}.`);
   else facts.push(`Left in this month's budget: ${moneyFormatter.format(remaining / 100)}.`);
-  if (budget !== null) facts.push(`Used ${Math.round((spentPaise / budget) * 100)}% of the monthly budget.`);
+  if (budget !== null)
+    facts.push(`Used ${Math.round((spentPaise / budget) * 100)}% of the monthly budget.`);
   if (monthExpenses.length === 0) facts.push("No expenses logged this month yet.");
   else facts.push(`Spent this month so far: ${moneyFormatter.format(spentPaise / 100)}.`);
   facts.push(`Current logging streak: ${streak} day(s).`);
@@ -152,7 +171,8 @@ export function buildBudgetFacts(state: SavedBudgetState, message: string, today
   if (amountPaise !== null) {
     const category = guessCategory(message);
     const categoryBudget = state.categoryBudgetsPaise[category];
-    const categoryRemaining = categoryBudget === undefined ? null : categoryBudget - (spentByCategory[category] ?? 0);
+    const categoryRemaining =
+      categoryBudget === undefined ? null : categoryBudget - (spentByCategory[category] ?? 0);
     const monthlyAfter = remaining === null ? null : remaining - amountPaise;
     const categoryAfter = categoryRemaining === null ? null : categoryRemaining - amountPaise;
 
@@ -160,7 +180,12 @@ export function buildBudgetFacts(state: SavedBudgetState, message: string, today
     if (monthlyAfter === null && categoryAfter === null) verdict = "no-budget";
     else if (monthlyAfter !== null && monthlyAfter < 0) verdict = "over";
     else if (categoryAfter !== null && categoryAfter < 0) verdict = "category-over";
-    else if (monthlyAfter !== null && budget !== null && monthlyAfter < budget * TIGHT_THRESHOLD_RATIO) verdict = "tight";
+    else if (
+      monthlyAfter !== null &&
+      budget !== null &&
+      monthlyAfter < budget * TIGHT_THRESHOLD_RATIO
+    )
+      verdict = "tight";
     else verdict = "fits";
 
     facts.push(
@@ -168,7 +193,8 @@ export function buildBudgetFacts(state: SavedBudgetState, message: string, today
         `This ${verdictText(verdict)}.`,
     );
     const left = monthlyAfter ?? categoryAfter;
-    if (left !== null) facts.push(`Left after that purchase: ${moneyFormatter.format(Math.max(0, left) / 100)}.`);
+    if (left !== null)
+      facts.push(`Left after that purchase: ${moneyFormatter.format(Math.max(0, left) / 100)}.`);
     const over = Math.max(-(monthlyAfter ?? 0), -(categoryAfter ?? 0), 0);
     if (over > 0) facts.push(`Would be over budget by ${moneyFormatter.format(over / 100)}.`);
   }

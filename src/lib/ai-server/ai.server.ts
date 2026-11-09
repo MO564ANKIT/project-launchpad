@@ -4,7 +4,8 @@
 // callers can fall back to deterministic text.
 import { GatewayError, generateChatCompletion } from "@lovable.dev/ai-gateway";
 
-const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent";
+const GEMINI_URL =
+  "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent";
 const TIMEOUT_MS = 25000;
 
 export interface AiTextRequest {
@@ -14,7 +15,9 @@ export interface AiTextRequest {
   history?: { role: "user" | "assistant"; text: string }[];
 }
 
-export type AiTextResult = { ok: true; text: string; source: "gemini" | "lovable-ai" } | { ok: false; reason: "timeout" | "unavailable" | "credits" | "rate-limit" };
+export type AiTextResult =
+  | { ok: true; text: string; source: "gemini" | "lovable-ai" }
+  | { ok: false; reason: "timeout" | "unavailable" | "credits" | "rate-limit" };
 
 export async function generateAiText(req: AiTextRequest): Promise<AiTextResult> {
   const geminiKey = process.env["GEMINI_API_KEY"];
@@ -27,7 +30,10 @@ export async function generateAiText(req: AiTextRequest): Promise<AiTextResult> 
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: req.system }] },
           contents: [
-            ...(req.history ?? []).map((item) => ({ role: item.role === "user" ? "user" : "model", parts: [{ text: item.text }] })),
+            ...(req.history ?? []).map((item) => ({
+              role: item.role === "user" ? "user" : "model",
+              parts: [{ text: item.text }],
+            })),
             { role: "user", parts: [{ text: req.user }] },
           ],
           generationConfig: { temperature: req.temperature ?? 0.6, maxOutputTokens: 2048 },
@@ -35,11 +41,15 @@ export async function generateAiText(req: AiTextRequest): Promise<AiTextResult> 
       });
       const data = await response.json().catch(() => null);
       const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (response.ok && typeof text === "string" && text.trim()) return { ok: true, text: text.trim(), source: "gemini" };
+      if (response.ok && typeof text === "string" && text.trim())
+        return { ok: true, text: text.trim(), source: "gemini" };
       console.error("gemini request failed", response.status);
       return { ok: false, reason: "unavailable" };
     } catch (err) {
-      return { ok: false, reason: err instanceof Error && err.name === "TimeoutError" ? "timeout" : "unavailable" };
+      return {
+        ok: false,
+        reason: err instanceof Error && err.name === "TimeoutError" ? "timeout" : "unavailable",
+      };
     }
   }
 

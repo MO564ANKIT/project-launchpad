@@ -13,9 +13,19 @@
 - [x] Dashboard: PayPal savings quest, recent transactions, demo journey checklist
 
 ## Phase 2 — Demo/judge-ready brief
-- [ ] 1. PayPal flow polish: return page states + XP celebration, webhook/return reconciliation, setup-needed notice, /api/public/paypal-health, "Test mode" note
-- [ ] 2. Goals (ring, countdown, milestone markers, completed section), Vault (date filter, detail drawer + timeline), Dashboard total saved, Guardian labels/non-blocking
-- [ ] 3. Demo mode (start/reset demo journey, own data only) + first-run guided tour
-- [ ] 4. Reliability: install/build/lint/tests, pin loose deps, new tests, per-route error boundaries
-- [ ] 5. Docs: README for judges, roadmap, docs/DEMO_SCRIPT.md
-- [ ] 6. UI polish: 360px mobile, skeletons/empty states/toasts, monster assets
+- [x] Sandbox setup notice on Goals + Marketplace; test-mode note in Purchase Guardian
+- [x] Goals: separate completed-goals section
+- [x] Vault: date filter + side panel with status timeline
+- [x] Dashboard: "Total saved via PayPal" (verified, non-demo only; demo shown separately)
+- [x] Purchase Guardian: "AI explanation" / "Calculated fallback" labels; pay button never waits for AI
+- [x] Demo mode: Start demo / Reset demo buttons (own data only) + first-run guided tour
+- [x] Reliability: pinned framer-motion and ai-gateway, 4 new tests (date filter, timeline, completed goals, total saved), error screen on every page, build + lint (0 errors) + tests (37 pass)
+- [x] Docs: README for judges, docs/DEMO_SCRIPT.md
+- [x] Mobile: every page checked at 360px, no sideways scrolling (header, streak row, cards fixed)
+
+## Honest status / not done yet
+- [ ] PayPal Sandbox checkout untested end to end: needs PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET, PAYPAL_WEBHOOK_ID
+- [ ] Live AI answers untested: needs GEMINI_API_KEY (calculated fallback works today)
+- [ ] Existing players and records from the old app not imported yet (waiting on exports)
+- [ ] The guided tour is a step-by-step card; it does not yet highlight on-screen elements
+- [ ] Lint shows 7 harmless warnings in shared UI files

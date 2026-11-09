@@ -1,7 +1,11 @@
 // Purchase Guardian and AI Insights. Budget data is read from the signed-in
 // player's own save on the server; the AI only rephrases computed facts.
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { isDateKey, readSavedBudgetState, type SavedBudgetState } from "../roast-server/budgetFacts";
+import {
+  isDateKey,
+  readSavedBudgetState,
+  type SavedBudgetState,
+} from "../roast-server/budgetFacts";
 import { CATALOGUE } from "../checkout-server/paypal.server";
 import { generateAiText } from "./ai.server";
 import {
@@ -16,10 +20,19 @@ import {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Db = SupabaseClient<any, any, any>;
 
-const EMPTY_STATE: SavedBudgetState = { monthlyBudgetPaise: null, categoryBudgetsPaise: {}, expenses: [], events: [] };
+const EMPTY_STATE: SavedBudgetState = {
+  monthlyBudgetPaise: null,
+  categoryBudgetsPaise: {},
+  expenses: [],
+  events: [],
+};
 
 async function loadBudgetState(db: Db, userId: string): Promise<SavedBudgetState> {
-  const { data, error } = await db.from("player_saves").select("state").eq("user_id", userId).maybeSingle();
+  const { data, error } = await db
+    .from("player_saves")
+    .select("state")
+    .eq("user_id", userId)
+    .maybeSingle();
   if (error) throw error;
   return readSavedBudgetState(data?.state) ?? EMPTY_STATE;
 }
@@ -39,7 +52,12 @@ export async function runGuardian(
   itemIds: unknown,
   today: unknown,
 ): Promise<GuardianResult | { ok: false; error: string }> {
-  if (!Array.isArray(itemIds) || itemIds.length === 0 || itemIds.length > 20 || !itemIds.every((id) => typeof id === "string" && Object.hasOwn(CATALOGUE, id))) {
+  if (
+    !Array.isArray(itemIds) ||
+    itemIds.length === 0 ||
+    itemIds.length > 20 ||
+    !itemIds.every((id) => typeof id === "string" && Object.hasOwn(CATALOGUE, id))
+  ) {
     return { ok: false, error: "Your cart has an item we do not recognise." };
   }
   if (!isDateKey(today)) return { ok: false, error: "The request was not in the expected shape." };
@@ -51,13 +69,24 @@ export async function runGuardian(
   const factLines = guardianFactLines(facts);
 
   // Deterministic cheaper alternative: the cheapest item of the same type as the priciest cart item.
-  const priciest = ids.reduce((a, b) => (CATALOGUE[a].priceUsdCents >= CATALOGUE[b].priceUsdCents ? a : b));
+  const priciest = ids.reduce((a, b) =>
+    CATALOGUE[a].priceUsdCents >= CATALOGUE[b].priceUsdCents ? a : b,
+  );
   const { data: owned } = await db.from("user_inventory").select("item_id").eq("user_id", userId);
   const ownedIds = new Set((owned ?? []).map((row: { item_id: string }) => row.item_id));
   const alternativeId = Object.entries(CATALOGUE)
-    .filter(([id, item]) => item.type === CATALOGUE[priciest].type && item.priceUsdCents < CATALOGUE[priciest].priceUsdCents && !ids.includes(id) && !ownedIds.has(id))
+    .filter(
+      ([id, item]) =>
+        item.type === CATALOGUE[priciest].type &&
+        item.priceUsdCents < CATALOGUE[priciest].priceUsdCents &&
+        !ids.includes(id) &&
+        !ownedIds.has(id),
+    )
     .sort((a, b) => a[1].priceUsdCents - b[1].priceUsdCents)[0]?.[0];
-  const alternative = facts.verdict !== "fits" && alternativeId ? { itemId: alternativeId, priceUsdCents: CATALOGUE[alternativeId].priceUsdCents } : null;
+  const alternative =
+    facts.verdict !== "fits" && alternativeId
+      ? { itemId: alternativeId, priceUsdCents: CATALOGUE[alternativeId].priceUsdCents }
+      : null;
 
   const ai = await generateAiText({
     system: [
@@ -88,7 +117,11 @@ export interface InsightsResult {
   suggestionSource: "ai" | "fallback";
 }
 
-export async function runInsights(db: Db, userId: string, today: unknown): Promise<InsightsResult | { ok: false; error: string }> {
+export async function runInsights(
+  db: Db,
+  userId: string,
+  today: unknown,
+): Promise<InsightsResult | { ok: false; error: string }> {
   if (!isDateKey(today)) return { ok: false, error: "The request was not in the expected shape." };
   const state = await loadBudgetState(db, userId);
   const { data: goals, error } = await db
@@ -104,7 +137,9 @@ export async function runInsights(db: Db, userId: string, today: unknown): Promi
     return {
       ok: true,
       facts: facts.lines,
-      suggestions: ["Log a few expenses first. Insights only use spending you have actually recorded."],
+      suggestions: [
+        "Log a few expenses first. Insights only use spending you have actually recorded.",
+      ],
       suggestionSource: "fallback",
     };
   }

@@ -26,7 +26,13 @@ export interface WebhookEvent {
 }
 
 export type WebhookAction =
-  | { kind: "complete"; orderId: string; captureId: string; amountCents: number | null; currency: string | null }
+  | {
+      kind: "complete";
+      orderId: string;
+      captureId: string;
+      amountCents: number | null;
+      currency: string | null;
+    }
   | { kind: "fail"; orderId: string; reason: string }
   | { kind: "refund"; captureId: string }
   | { kind: "ignore" };
@@ -39,7 +45,8 @@ function valueToCents(value: unknown): number | null {
 export function parseWebhookEvent(value: unknown): WebhookEvent | null {
   if (typeof value !== "object" || value === null) return null;
   const event = value as WebhookEvent;
-  if (typeof event.id !== "string" || event.id.length > 100 || typeof event.event_type !== "string") return null;
+  if (typeof event.id !== "string" || event.id.length > 100 || typeof event.event_type !== "string")
+    return null;
   return event;
 }
 
@@ -54,7 +61,8 @@ export function interpretWebhookEvent(event: WebhookEvent): WebhookAction {
         orderId,
         captureId: resource.id,
         amountCents: valueToCents(resource.amount?.value),
-        currency: typeof resource.amount?.currency_code === "string" ? resource.amount.currency_code : null,
+        currency:
+          typeof resource.amount?.currency_code === "string" ? resource.amount.currency_code : null,
       };
     case "PAYMENT.CAPTURE.DENIED":
     case "PAYMENT.CAPTURE.DECLINED":
@@ -63,7 +71,9 @@ export function interpretWebhookEvent(event: WebhookEvent): WebhookAction {
     case "PAYMENT.CAPTURE.REFUNDED":
     case "PAYMENT.CAPTURE.REVERSED":
       // The refunded resource links back to the capture via its "up" link; we match on capture id when present.
-      return typeof resource.id === "string" ? { kind: "refund", captureId: resource.id } : { kind: "ignore" };
+      return typeof resource.id === "string"
+        ? { kind: "refund", captureId: resource.id }
+        : { kind: "ignore" };
     default:
       return { kind: "ignore" };
   }
@@ -125,7 +135,8 @@ export async function processWebhookEvent(db: Db, event: WebhookEvent): Promise<
       .maybeSingle();
     if (error) throw error;
     if (!order) outcome = "unknown-order";
-    else if (order.amount_cents !== action.amountCents || order.currency !== action.currency) outcome = "amount-mismatch";
+    else if (order.amount_cents !== action.amountCents || order.currency !== action.currency)
+      outcome = "amount-mismatch";
     else {
       await creditVerifiedOrder(db, action.orderId, action.captureId);
       outcome = "credited";
@@ -133,7 +144,11 @@ export async function processWebhookEvent(db: Db, event: WebhookEvent): Promise<
   } else if (action.kind === "fail") {
     const { error } = await db
       .from("shop_orders")
-      .update({ status: "failed", failure_reason: action.reason, updated_at: new Date().toISOString() })
+      .update({
+        status: "failed",
+        failure_reason: action.reason,
+        updated_at: new Date().toISOString(),
+      })
       .eq("paypal_order_id", action.orderId)
       .in("status", ["created", "capturing", "pending"]);
     if (error) throw error;
@@ -141,7 +156,11 @@ export async function processWebhookEvent(db: Db, event: WebhookEvent): Promise<
   } else if (action.kind === "refund") {
     const { error } = await db
       .from("shop_orders")
-      .update({ status: "refunded", failure_reason: "Refunded at PayPal", updated_at: new Date().toISOString() })
+      .update({
+        status: "refunded",
+        failure_reason: "Refunded at PayPal",
+        updated_at: new Date().toISOString(),
+      })
       .eq("paypal_capture_id", action.captureId)
       .eq("status", "completed");
     if (error) throw error;

@@ -1,9 +1,9 @@
-import { CATEGORIES, type Category } from '@/lib/categories';
-import { monthKeyOf } from '@/lib/dates';
-import { formatMoney, percentOf } from '@/lib/money';
-import type { Expense, GameState } from '@/types';
+import { CATEGORIES, type Category } from "@/lib/categories";
+import { monthKeyOf } from "@/lib/dates";
+import { formatMoney, percentOf } from "@/lib/money";
+import type { Expense, GameState } from "@/types";
 
-type BudgetInputs = Pick<GameState, 'monthlyBudgetPaise' | 'categoryBudgetsPaise' | 'expenses'>;
+type BudgetInputs = Pick<GameState, "monthlyBudgetPaise" | "categoryBudgetsPaise" | "expenses">;
 
 export interface CategoryTotal {
   category: Category;
@@ -30,7 +30,10 @@ export function summarizeMonth(state: BudgetInputs, monthKey: string): MonthSumm
 
   for (const expense of monthExpenses) {
     spentPaise += expense.amountPaise;
-    spentByCategory.set(expense.category, (spentByCategory.get(expense.category) ?? 0) + expense.amountPaise);
+    spentByCategory.set(
+      expense.category,
+      (spentByCategory.get(expense.category) ?? 0) + expense.amountPaise,
+    );
   }
 
   const categories = CATEGORIES.map((category) => {
@@ -67,7 +70,7 @@ export function sortExpenses(expenses: Expense[]): Expense[] {
   });
 }
 
-export type Verdict = 'no-budget' | 'fits' | 'tight' | 'over' | 'category-over';
+export type Verdict = "no-budget" | "fits" | "tight" | "over" | "category-over";
 
 export interface Simulation {
   amountPaise: number;
@@ -84,7 +87,11 @@ export interface Simulation {
 
 const TIGHT_THRESHOLD_RATIO = 0.1;
 
-export function simulatePurchase(summary: MonthSummary, amountPaise: number, category: Category): Simulation {
+export function simulatePurchase(
+  summary: MonthSummary,
+  amountPaise: number,
+  category: Category,
+): Simulation {
   const categoryEntry = summary.categories.find((entry) => entry.category === category);
   const monthlyBefore = summary.remainingPaise;
   const categoryBefore = categoryEntry?.remainingPaise ?? null;
@@ -93,15 +100,19 @@ export function simulatePurchase(summary: MonthSummary, amountPaise: number, cat
 
   let verdict: Verdict;
   if (monthlyAfter === null && categoryAfter === null) {
-    verdict = 'no-budget';
+    verdict = "no-budget";
   } else if (monthlyAfter !== null && monthlyAfter < 0) {
-    verdict = 'over';
+    verdict = "over";
   } else if (categoryAfter !== null && categoryAfter < 0) {
-    verdict = 'category-over';
-  } else if (monthlyAfter !== null && summary.budgetPaise !== null && monthlyAfter < summary.budgetPaise * TIGHT_THRESHOLD_RATIO) {
-    verdict = 'tight';
+    verdict = "category-over";
+  } else if (
+    monthlyAfter !== null &&
+    summary.budgetPaise !== null &&
+    monthlyAfter < summary.budgetPaise * TIGHT_THRESHOLD_RATIO
+  ) {
+    verdict = "tight";
   } else {
-    verdict = 'fits';
+    verdict = "fits";
   }
 
   return {
@@ -113,7 +124,10 @@ export function simulatePurchase(summary: MonthSummary, amountPaise: number, cat
     categoryAfter,
     monthlyOverPaise: Math.max(0, -(monthlyAfter ?? 0)),
     categoryOverPaise: Math.max(0, -(categoryAfter ?? 0)),
-    usedPercentAfter: summary.budgetPaise === null ? null : percentOf(summary.spentPaise + amountPaise, summary.budgetPaise),
+    usedPercentAfter:
+      summary.budgetPaise === null
+        ? null
+        : percentOf(summary.spentPaise + amountPaise, summary.budgetPaise),
     verdict,
   };
 }
@@ -132,36 +146,38 @@ export function buildAlternatives(sim: Simulation, daysLeft: number): Alternativ
 
   return [
     {
-      id: 'buy-now',
-      title: 'Buy it now',
+      id: "buy-now",
+      title: "Buy it now",
       detail:
-        sim.verdict === 'over' || sim.verdict === 'category-over'
+        sim.verdict === "over" || sim.verdict === "category-over"
           ? `You would be ${formatMoney(Math.max(sim.monthlyOverPaise, sim.categoryOverPaise))} past a limit. Expect a stern look from your monsters.`
-          : 'Fastest route to the item. Your remaining budget takes the full hit right away.',
+          : "Fastest route to the item. Your remaining budget takes the full hit right away.",
       remainingAfterPaise: sim.monthlyAfter,
     },
     {
-      id: 'wait-week',
-      title: 'Wait 7 days, then decide',
-      detail: 'Nothing changes until you decide. Many urges fade within a week, and you keep every option open.',
+      id: "wait-week",
+      title: "Wait 7 days, then decide",
+      detail:
+        "Nothing changes until you decide. Many urges fade within a week, and you keep every option open.",
       remainingAfterPaise: monthlyBefore,
     },
     {
-      id: 'half-price',
-      title: 'Find a half-price version',
+      id: "half-price",
+      title: "Find a half-price version",
       detail: `A ${formatMoney(halfPrice)} alternative keeps most of the fun and saves ${formatMoney(amountPaise - halfPrice)} compared with the original.`,
       remainingAfterPaise: monthlyBefore === null ? null : monthlyBefore - halfPrice,
     },
     {
-      id: 'set-aside',
-      title: 'Set money aside each day',
+      id: "set-aside",
+      title: "Set money aside each day",
       detail: `Put ${formatMoney(dailySetAside)} aside daily for the rest of the month. The money stays in your budget but is reserved, so you only buy once it is fully saved.`,
       remainingAfterPaise: monthlyBefore,
     },
     {
-      id: 'skip',
-      title: 'Skip it',
-      detail: 'You keep the full remaining budget and the money stays where it is. Skipping counts toward a quest.',
+      id: "skip",
+      title: "Skip it",
+      detail:
+        "You keep the full remaining budget and the money stays where it is. Skipping counts toward a quest.",
       remainingAfterPaise: monthlyBefore,
     },
   ];

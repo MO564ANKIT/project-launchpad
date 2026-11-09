@@ -4,7 +4,8 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { buildBudgetFacts, isDateKey, readSavedBudgetState } from "./budgetFacts";
 
 const ROAST_LIMIT_PER_HOUR = 30;
-const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent";
+const GEMINI_URL =
+  "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent";
 const MAX_MESSAGE_LENGTH = 200;
 const MAX_HISTORY = 10;
 const MAX_HISTORY_TEXT = 300;
@@ -12,10 +13,14 @@ const MAX_FACTS = 12;
 const MAX_FACT_LENGTH = 300;
 
 export const PERSONA_STYLE: Record<string, string> = {
-  softie: "You are a gentle, warm money buddy. Nudge kindly, celebrate small wins, never shame the user.",
-  savage: "You are a blunt, witty roaster. Tease hard and fast, no sugar coating, but never cruel about the person's worth.",
-  "big-brain": "You are a calm data analyst. Lead with numbers and trade-offs, keep feelings to one short line.",
-  unhinged: "You are chaotic, hyped and playful, with big energy and short punchy sentences. Keep it fun, not mean.",
+  softie:
+    "You are a gentle, warm money buddy. Nudge kindly, celebrate small wins, never shame the user.",
+  savage:
+    "You are a blunt, witty roaster. Tease hard and fast, no sugar coating, but never cruel about the person's worth.",
+  "big-brain":
+    "You are a calm data analyst. Lead with numbers and trade-offs, keep feelings to one short line.",
+  unhinged:
+    "You are chaotic, hyped and playful, with big energy and short punchy sentences. Keep it fun, not mean.",
 };
 
 const RULES = [
@@ -48,7 +53,12 @@ function isHistory(value: unknown): value is HistoryItem[] {
   );
 }
 
-function buildRequest(personality: string, message: string, facts: string[], history: HistoryItem[]) {
+function buildRequest(
+  personality: string,
+  message: string,
+  facts: string[],
+  history: HistoryItem[],
+) {
   const system = [PERSONA_STYLE[personality], RULES].join("\n\n");
   const contents = [
     ...history.slice(-MAX_HISTORY).map((item) => ({
@@ -59,7 +69,14 @@ function buildRequest(personality: string, message: string, facts: string[], his
       role: "user",
       parts: [
         {
-          text: `Facts from the user's budget app:\n${facts.length ? facts.slice(0, MAX_FACTS).map((fact) => `- ${fact.slice(0, MAX_FACT_LENGTH)}`).join("\n") : "- (none)"}\n\nUser message: ${message}`,
+          text: `Facts from the user's budget app:\n${
+            facts.length
+              ? facts
+                  .slice(0, MAX_FACTS)
+                  .map((fact) => `- ${fact.slice(0, MAX_FACT_LENGTH)}`)
+                  .join("\n")
+              : "- (none)"
+          }\n\nUser message: ${message}`,
         },
       ],
     },
@@ -87,7 +104,11 @@ export async function runRoast(
   if (typeof personality !== "string" || !Object.hasOwn(PERSONA_STYLE, personality)) {
     return { ok: false, error: "Pick a personality and try again." };
   }
-  if (typeof message !== "string" || message.trim().length === 0 || message.length > MAX_MESSAGE_LENGTH) {
+  if (
+    typeof message !== "string" ||
+    message.trim().length === 0 ||
+    message.length > MAX_MESSAGE_LENGTH
+  ) {
     return { ok: false, error: "Your message must be between 1 and 200 characters." };
   }
   if (!isDateKey(today) || !isHistory(history)) {
@@ -132,8 +153,10 @@ export async function runRoast(
       temperature: 1.0,
     });
     if (result.ok) return { ok: true, reply: result.text };
-    if (result.reason === "credits") return { ok: false, error: "The AI roaster is out of credits right now." };
-    if (result.reason === "rate-limit") return { ok: false, error: "Too many roasts at once. Try again in a minute." };
+    if (result.reason === "credits")
+      return { ok: false, error: "The AI roaster is out of credits right now." };
+    if (result.reason === "rate-limit")
+      return { ok: false, error: "Too many roasts at once. Try again in a minute." };
     return { ok: false, error: "The AI roaster is taking a break. Try again in a moment." };
   }
 

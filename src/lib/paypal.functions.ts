@@ -25,8 +25,7 @@ export interface CheckoutBody {
 }
 
 export type CheckoutResponse =
-  | { ok: true; body: CheckoutBody }
-  | { ok: false; error: string; code?: "setup_needed" };
+  { ok: true; body: CheckoutBody } | { ok: false; error: string; code?: "setup_needed" };
 
 const ACTIONS: CheckoutAction[] = ["create", "contribute", "capture", "cancel"];
 
@@ -59,12 +58,14 @@ export const paypalCheckout = createServerFn({ method: "POST" })
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const checkout = await import("./checkout-server/paypal.server");
       if (!checkout.paypalConfigured()) {
-        const { paypalSetupStatus, logMissingPaypalSecrets } = await import("./checkout-server/setupStatus");
+        const { paypalSetupStatus, logMissingPaypalSecrets } =
+          await import("./checkout-server/setupStatus");
         logMissingPaypalSecrets(`checkout ${data.action}`, paypalSetupStatus(process.env));
         return {
           ok: false,
           code: "setup_needed",
-          error: "Sandbox setup needed: PayPal test keys are not configured yet, so checkout is paused. No money was charged.",
+          error:
+            "Sandbox setup needed: PayPal test keys are not configured yet, so checkout is paused. No money was charged.",
         };
       }
       const { userId } = context;
@@ -72,7 +73,13 @@ export const paypalCheckout = createServerFn({ method: "POST" })
         case "create":
           return await checkout.createOrder(supabaseAdmin, userId, data.itemIds, resolveOrigin());
         case "contribute":
-          return await checkout.createGoalContribution(supabaseAdmin, userId, data.goalId, data.amountCents, resolveOrigin());
+          return await checkout.createGoalContribution(
+            supabaseAdmin,
+            userId,
+            data.goalId,
+            data.amountCents,
+            resolveOrigin(),
+          );
         case "capture":
           return await checkout.captureOrder(supabaseAdmin, userId, data.orderId);
         case "cancel":
@@ -80,7 +87,10 @@ export const paypalCheckout = createServerFn({ method: "POST" })
       }
     } catch (err) {
       console.error("paypal-checkout failed", err instanceof Error ? err.message : "unknown error");
-      return { ok: false, error: "Something went wrong with the payment service. Please try again." };
+      return {
+        ok: false,
+        error: "Something went wrong with the payment service. Please try again.",
+      };
     }
   });
 
@@ -93,7 +103,8 @@ export interface PaypalSetupView {
 export const paypalSetup = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async (): Promise<PaypalSetupView> => {
-    const { paypalSetupStatus, logMissingPaypalSecrets } = await import("./checkout-server/setupStatus");
+    const { paypalSetupStatus, logMissingPaypalSecrets } =
+      await import("./checkout-server/setupStatus");
     const status = paypalSetupStatus(process.env);
     logMissingPaypalSecrets("setup check", status);
     return { checkoutReady: status.checkoutReady, webhooksReady: status.webhooksReady };

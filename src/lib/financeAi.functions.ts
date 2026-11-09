@@ -40,7 +40,10 @@ export const purchaseGuardian = createServerFn({ method: "POST" })
       const { runGuardian } = await import("./ai-server/financeAi.server");
       return await runGuardian(context.supabase, context.userId, data.itemIds, data.today);
     } catch (err) {
-      console.error("purchase-guardian failed", err instanceof Error ? err.message : "unknown error");
+      console.error(
+        "purchase-guardian failed",
+        err instanceof Error ? err.message : "unknown error",
+      );
       return { ok: false, error: "The Purchase Guardian could not check your budget right now." };
     }
   });
@@ -55,7 +58,10 @@ export const financialInsights = createServerFn({ method: "POST" })
       const { runInsights } = await import("./ai-server/financeAi.server");
       return await runInsights(context.supabase, context.userId, data.today);
     } catch (err) {
-      console.error("financial-insights failed", err instanceof Error ? err.message : "unknown error");
+      console.error(
+        "financial-insights failed",
+        err instanceof Error ? err.message : "unknown error",
+      );
       return { ok: false, error: "Insights could not be generated right now." };
     }
   });

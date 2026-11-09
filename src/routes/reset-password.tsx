@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Flame, KeyRound } from "lucide-react";
+import { RouteError } from "@/components/app/RouteError";
 import { Button } from "@/components/kit/Button";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/state/authContext";
@@ -16,6 +17,7 @@ export const Route = createFileRoute("/reset-password")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
+  errorComponent: RouteError,
   component: ResetPasswordPage,
 });
 
@@ -65,21 +67,26 @@ function ResetPasswordPage() {
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-neon-400/50 bg-night-900 shadow-glow-neon">
             <Flame className="h-6 w-6 text-neon-300" strokeWidth={2.25} />
           </div>
-          <p className="font-display text-2xl font-bold uppercase tracking-[0.18em] text-ink-50">Spendemon</p>
+          <p className="font-display text-2xl font-bold uppercase tracking-[0.18em] text-ink-50">
+            Spendemon
+          </p>
         </div>
 
         <section className="card space-y-6 p-6 sm:p-8">
           <div className="space-y-2">
             <h1 className="text-xl font-bold text-ink-50">Choose a new password</h1>
             <p className="text-sm text-ink-300">
-              {ready ? "Your email is confirmed. Pick a password to finish signing in." : "Open the link from your email to continue."}
+              {ready
+                ? "Your email is confirmed. Pick a password to finish signing in."
+                : "Open the link from your email to continue."}
             </p>
           </div>
 
           {linkError || (!loading && !session) ? (
             <div className="space-y-4">
               <p role="alert" className="text-sm text-rose-300">
-                {linkError ?? "This link has expired or was already used."} Request a new one from the sign-in screen.
+                {linkError ?? "This link has expired or was already used."} Request a new one from
+                the sign-in screen.
               </p>
               <Button variant="ghost" className="w-full" onClick={() => void navigate({ to: "/" })}>
                 Back to sign in
@@ -120,7 +127,12 @@ function ResetPasswordPage() {
                   {error}
                 </p>
               )}
-              <Button type="submit" variant="primary" className="w-full" disabled={submitting || !ready}>
+              <Button
+                type="submit"
+                variant="primary"
+                className="w-full"
+                disabled={submitting || !ready}
+              >
                 <KeyRound className="h-4 w-4" />
                 {submitting ? "Saving..." : ready ? "Save password" : "Checking your link..."}
               </Button>

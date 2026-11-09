@@ -1,14 +1,14 @@
-import { useState, type FormEvent } from 'react';
-import { Button } from '@/components/kit/Button';
-import { FormField } from '@/components/kit/FormField';
-import { CATEGORIES, CATEGORY_META, type Category } from '@/lib/categories';
-import { parseAmountToPaise } from '@/lib/money';
-import { categoryIcon } from '@/components/kit/categoryIcons';
-import type { ExpenseInput } from '@/state/gameContext';
-import type { Expense } from '@/types';
-import { cn } from '@/lib/cn';
+import { useState, type FormEvent } from "react";
+import { Button } from "@/components/kit/Button";
+import { FormField } from "@/components/kit/FormField";
+import { CATEGORIES, CATEGORY_META, type Category } from "@/lib/categories";
+import { parseAmountToPaise } from "@/lib/money";
+import { categoryIcon } from "@/components/kit/categoryIcons";
+import type { ExpenseInput } from "@/state/gameContext";
+import type { Expense } from "@/types";
+import { cn } from "@/lib/cn";
 
-type FieldErrors = Partial<Record<'amount' | 'date' | 'description', string>>;
+type FieldErrors = Partial<Record<"amount" | "date" | "description", string>>;
 
 const MAX_DESCRIPTION = 80;
 
@@ -20,10 +20,10 @@ interface ExpenseFormProps {
 }
 
 export function ExpenseForm({ initial, today, onSubmit, onCancel }: ExpenseFormProps) {
-  const [amount, setAmount] = useState(initial ? String(initial.amountPaise / 100) : '');
-  const [category, setCategory] = useState<Category>(initial?.category ?? 'food');
+  const [amount, setAmount] = useState(initial ? String(initial.amountPaise / 100) : "");
+  const [category, setCategory] = useState<Category>(initial?.category ?? "food");
   const [date, setDate] = useState(initial?.date ?? today);
-  const [description, setDescription] = useState(initial?.description ?? '');
+  const [description, setDescription] = useState(initial?.description ?? "");
   const [errors, setErrors] = useState<FieldErrors>({});
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -33,17 +33,17 @@ export function ExpenseForm({ initial, today, onSubmit, onCancel }: ExpenseFormP
     const trimmedDescription = description.trim();
 
     if (amountPaise === null) {
-      nextErrors.amount = 'Enter an amount like 249 or 249.50.';
+      nextErrors.amount = "Enter an amount like 249 or 249.50.";
     } else if (amountPaise <= 0) {
-      nextErrors.amount = 'The amount must be more than zero.';
+      nextErrors.amount = "The amount must be more than zero.";
     }
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !date) {
-      nextErrors.date = 'Pick a valid date.';
+      nextErrors.date = "Pick a valid date.";
     } else if (date > today) {
-      nextErrors.date = 'Expenses cannot be dated in the future.';
+      nextErrors.date = "Expenses cannot be dated in the future.";
     }
     if (trimmedDescription.length === 0) {
-      nextErrors.description = 'Add a short description so future you remembers.';
+      nextErrors.description = "Add a short description so future you remembers.";
     } else if (trimmedDescription.length > MAX_DESCRIPTION) {
       nextErrors.description = `Keep it under ${MAX_DESCRIPTION} characters.`;
     }
@@ -56,9 +56,16 @@ export function ExpenseForm({ initial, today, onSubmit, onCancel }: ExpenseFormP
 
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-5">
-      <FormField label="Amount (INR)" htmlFor="expense-amount" error={errors.amount} hint="Use paise for fractions, e.g. 99.50">
+      <FormField
+        label="Amount (INR)"
+        htmlFor="expense-amount"
+        error={errors.amount}
+        hint="Use paise for fractions, e.g. 99.50"
+      >
         <div className="relative">
-          <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 font-bold text-ink-300">₹</span>
+          <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 font-bold text-ink-300">
+            ₹
+          </span>
           <input
             id="expense-amount"
             inputMode="decimal"
@@ -85,10 +92,10 @@ export function ExpenseForm({ initial, today, onSubmit, onCancel }: ExpenseFormP
                 aria-pressed={selected}
                 onClick={() => setCategory(option)}
                 className={cn(
-                  'flex items-center gap-2 rounded-xl border px-3 py-2.5 text-left text-xs font-medium transition',
+                  "flex items-center gap-2 rounded-xl border px-3 py-2.5 text-left text-xs font-medium transition",
                   selected
-                    ? 'border-neon-400 bg-neon-500/15 text-neon-300 shadow-glow-neon'
-                    : 'border-white/10 bg-night-950/50 text-ink-200 hover:border-white/25',
+                    ? "border-neon-400 bg-neon-500/15 text-neon-300 shadow-glow-neon"
+                    : "border-white/10 bg-night-950/50 text-ink-200 hover:border-white/25",
                 )}
               >
                 <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
@@ -128,7 +135,7 @@ export function ExpenseForm({ initial, today, onSubmit, onCancel }: ExpenseFormP
           Cancel
         </Button>
         <Button type="submit" variant="primary">
-          {initial ? 'Save changes' : 'Log expense'}
+          {initial ? "Save changes" : "Log expense"}
         </Button>
       </div>
     </form>

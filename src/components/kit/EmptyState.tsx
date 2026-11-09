@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react';
-import { Lock } from 'lucide-react';
+import type { ReactNode } from "react";
+import { Lock } from "lucide-react";
 
 interface EmptyStateProps {
   icon?: ReactNode;

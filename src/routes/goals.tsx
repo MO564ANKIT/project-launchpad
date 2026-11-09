@@ -1,16 +1,26 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { RouteError } from "@/components/app/RouteError";
 import { GoalsPage } from "@/screens/GoalsPage";
 
 export const Route = createFileRoute("/goals")({
   head: () => ({
     meta: [
       { title: "Save to Level | Spendemon" },
-      { name: "description", content: "Create savings goals and make verified PayPal Sandbox contributions that level up your monsters." },
+      {
+        name: "description",
+        content:
+          "Create savings goals and make verified PayPal Sandbox contributions that level up your monsters.",
+      },
       { property: "og:title", content: "Save to Level | Spendemon" },
-      { property: "og:description", content: "Create savings goals and make verified PayPal Sandbox contributions that level up your monsters." },
+      {
+        property: "og:description",
+        content:
+          "Create savings goals and make verified PayPal Sandbox contributions that level up your monsters.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  errorComponent: RouteError,
   component: GoalsPage,
 });

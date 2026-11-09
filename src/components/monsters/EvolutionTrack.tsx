@@ -1,4 +1,10 @@
-import { MAX_LEVEL, STAGE_START_LEVELS, stageName, type MonsterSpecies, type Stage } from '@/lib/monsters';
+import {
+  MAX_LEVEL,
+  STAGE_START_LEVELS,
+  stageName,
+  type MonsterSpecies,
+  type Stage,
+} from "@/lib/monsters";
 
 const STAGES: Stage[] = [1, 2, 3];
 
@@ -21,7 +27,10 @@ export function EvolutionTrack({ species, level, stage, unlocked }: EvolutionTra
       <div className="relative h-2 rounded-full bg-white/10" role="presentation">
         <div
           className="absolute inset-y-0 left-0 rounded-full transition-[width] duration-700 ease-out"
-          style={{ width: `${fill}%`, background: `linear-gradient(90deg, ${species.color}, #bef264)` }}
+          style={{
+            width: `${fill}%`,
+            background: `linear-gradient(90deg, ${species.color}, #bef264)`,
+          }}
         />
         {STAGES.slice(1).map((next) => (
           <span
@@ -35,7 +44,7 @@ export function EvolutionTrack({ species, level, stage, unlocked }: EvolutionTra
         {STAGES.map((item) => {
           const reached = unlocked && stage >= item;
           return (
-            <li key={item} className={reached ? 'truncate text-lime-300' : 'truncate text-ink-400'}>
+            <li key={item} className={reached ? "truncate text-lime-300" : "truncate text-ink-400"}>
               {reached ? stageName(species.id, item) : `Lv ${STAGE_START_LEVELS[item]}`}
             </li>
           );

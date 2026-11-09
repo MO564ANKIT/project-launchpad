@@ -1,36 +1,82 @@
-import { ArrowRight, Check, PiggyBank, Receipt } from 'lucide-react';
-import type { PageId } from '@/components/layout/BottomNav';
-import { Button } from '@/components/kit/Button';
-import { ProgressBar } from '@/components/kit/ProgressBar';
-import { Skeleton } from '@/components/kit/Skeleton';
-import { SandboxBadge } from '@/components/checkout/SandboxBadge';
-import { StatusPill } from '@/components/checkout/StatusPill';
-import { LOOT_BY_ID } from '@/lib/lootCatalogue';
-import { formatUsdCents } from '@/lib/money';
-import { goalProgress, useGoals, useTransactions } from '@/lib/ledger';
-import { cn } from '@/lib/cn';
-import { useGame } from '@/state/gameContext';
+import { useCallback, useState } from "react";
+import { ArrowRight, Check, Loader2, PiggyBank, Play, Receipt, RotateCcw } from "lucide-react";
+import { demoJourney } from "@/lib/demo.functions";
+import { Toast } from "@/components/kit/Toast";
+import type { PageId } from "@/components/layout/BottomNav";
+import { Button } from "@/components/kit/Button";
+import { ProgressBar } from "@/components/kit/ProgressBar";
+import { Skeleton } from "@/components/kit/Skeleton";
+import { SandboxBadge } from "@/components/checkout/SandboxBadge";
+import { StatusPill } from "@/components/checkout/StatusPill";
+import { LOOT_BY_ID } from "@/lib/lootCatalogue";
+import { formatUsdCents } from "@/lib/money";
+import {
+  goalProgress,
+  totalSavedCents,
+  useGoals,
+  useRefreshLedger,
+  useTransactions,
+} from "@/lib/ledger";
+import { cn } from "@/lib/cn";
+import { useGame } from "@/state/gameContext";
 
 export function SavingsOverview({ onNavigate }: { onNavigate: (page: PageId) => void }) {
   const goals = useGoals();
   const transactions = useTransactions();
   const { state } = useGame();
-  const activeGoal = (goals.data ?? []).find((goal) => !goal.completed_at) ?? goals.data?.[0] ?? null;
+  const refresh = useRefreshLedger();
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const dismissToast = useCallback(() => setToastMsg(null), []);
+  const toast = (message: string, _tone?: "error") => setToastMsg(message);
+  const [demoBusy, setDemoBusy] = useState<"start" | "reset" | null>(null);
+  const txRows = transactions.data ?? [];
+  const savedReal = totalSavedCents(txRows);
+  const savedDemo = totalSavedCents(txRows, true) - savedReal;
+  const hasDemo =
+    txRows.some((tx) => tx.is_demo) || (goals.data ?? []).some((goal) => goal.is_demo);
+
+  const runDemo = async (action: "start" | "reset") => {
+    setDemoBusy(action);
+    try {
+      const result = await demoJourney({ data: { action } });
+      if (result.ok) {
+        await refresh();
+        toast(
+          action === "start"
+            ? "Demo journey started: a sample goal and payment were added."
+            : "Demo data removed.",
+        );
+      } else toast(result.error, "error");
+    } catch {
+      toast("The demo could not be updated. Please try again.", "error");
+    } finally {
+      setDemoBusy(null);
+    }
+  };
+  const activeGoal =
+    (goals.data ?? []).find((goal) => !goal.completed_at) ?? goals.data?.[0] ?? null;
   const recent = (transactions.data ?? []).slice(0, 4);
-  const goalNames = Object.fromEntries((goals.data ?? []).map((goal) => [goal.id, goal.name])) as Record<string, string>;
-  const hasVerifiedContribution = (transactions.data ?? []).some((tx) => tx.kind === 'goal_contribution' && tx.status === 'completed');
-  const usedGuardian = state.events.some((event) => event.type === 'purchase_reconsidered' || event.type === 'purchase_completed');
-  const reviewed = state.events.some((event) => event.type === 'spending_reviewed');
+  const goalNames = Object.fromEntries(
+    (goals.data ?? []).map((goal) => [goal.id, goal.name]),
+  ) as Record<string, string>;
+  const hasVerifiedContribution = (transactions.data ?? []).some(
+    (tx) => tx.kind === "goal_contribution" && tx.status === "completed",
+  );
+  const usedGuardian = state.events.some(
+    (event) => event.type === "purchase_reconsidered" || event.type === "purchase_completed",
+  );
+  const reviewed = state.events.some((event) => event.type === "spending_reviewed");
 
   const steps: { label: string; done: boolean; page: PageId }[] = [
-    { label: 'Create a savings goal', done: (goals.data ?? []).length > 0, page: 'goals' },
-    { label: 'Contribute with PayPal Sandbox', done: hasVerifiedContribution, page: 'goals' },
-    { label: 'Check an item with the Purchase Guardian', done: usedGuardian, page: 'shop' },
-    { label: 'Review your spending', done: reviewed, page: 'vault' },
+    { label: "Create a savings goal", done: (goals.data ?? []).length > 0, page: "goals" },
+    { label: "Contribute with PayPal Sandbox", done: hasVerifiedContribution, page: "goals" },
+    { label: "Check an item with the Purchase Guardian", done: usedGuardian, page: "shop" },
+    { label: "Review your spending", done: reviewed, page: "vault" },
   ];
 
   return (
     <div className="grid gap-6 lg:grid-cols-12">
+      <Toast message={toastMsg} onDismiss={dismissToast} />
       <section className="card p-6 sm:p-8 lg:col-span-5">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <h2 className="flex items-center gap-2 text-lg font-bold text-ink-50">
@@ -38,26 +84,88 @@ export function SavingsOverview({ onNavigate }: { onNavigate: (page: PageId) => 
           </h2>
           <SandboxBadge />
         </div>
+        <div className="mb-5 rounded-2xl bg-night-950/50 p-4">
+          <p className="text-xs font-bold uppercase tracking-wider text-ink-400">
+            Total saved via PayPal
+          </p>
+          {transactions.isLoading ? (
+            <Skeleton className="mt-2 h-8 w-32" />
+          ) : (
+            <>
+              <p className="mt-1 font-display text-3xl font-bold text-neon-300">
+                {formatUsdCents(savedReal)}
+              </p>
+              <p className="text-xs text-ink-400">
+                Verified Sandbox contributions
+                {savedDemo > 0 ? ` · plus ${formatUsdCents(savedDemo)} of demo data` : ""}
+              </p>
+            </>
+          )}
+        </div>
         {goals.isLoading ? (
           <Skeleton className="h-24" />
         ) : activeGoal ? (
           <div>
             <p className="font-semibold text-ink-50">{activeGoal.name}</p>
             <p className="mt-1 text-sm text-ink-300">
-              {formatUsdCents(activeGoal.contributed_cents)} of {formatUsdCents(activeGoal.target_cents)} saved
+              {formatUsdCents(activeGoal.contributed_cents)} of{" "}
+              {formatUsdCents(activeGoal.target_cents)} saved
             </p>
-            <ProgressBar className="mt-3" value={goalProgress(activeGoal)} tone="neon" label={`${activeGoal.name} progress`} />
-            <p className="mt-2 text-xs text-ink-400">Only verified PayPal Sandbox contributions count. Simulated, not a real deposit.</p>
+            <ProgressBar
+              className="mt-3"
+              value={goalProgress(activeGoal)}
+              tone="neon"
+              label={`${activeGoal.name} progress`}
+            />
+            <p className="mt-2 text-xs text-ink-400">
+              Only verified PayPal Sandbox contributions count. Simulated, not a real deposit.
+            </p>
           </div>
         ) : (
-          <p className="text-sm text-ink-300">No goal yet. Create one to start levelling up Saverion with simulated savings.</p>
+          <p className="text-sm text-ink-300">
+            No goal yet. Create one to start levelling up Saverion with simulated savings.
+          </p>
         )}
-        <Button variant="primary" size="sm" className="mt-5" onClick={() => onNavigate('goals')}>
-          {activeGoal ? 'Contribute' : 'Create a goal'} <ArrowRight className="h-4 w-4" />
+        <Button variant="primary" size="sm" className="mt-5" onClick={() => onNavigate("goals")}>
+          {activeGoal ? "Contribute" : "Create a goal"} <ArrowRight className="h-4 w-4" />
         </Button>
 
         <div className="mt-6 border-t border-white/10 pt-5">
-          <p className="text-xs font-bold uppercase tracking-wider text-ink-400">Demo journey</p>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-xs font-bold uppercase tracking-wider text-ink-400">Demo journey</p>
+            <div className="flex gap-2">
+              <Button
+                variant="volt"
+                size="sm"
+                onClick={() => runDemo("start")}
+                disabled={demoBusy !== null}
+              >
+                {demoBusy === "start" ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Play className="h-4 w-4" />
+                )}{" "}
+                Start demo
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => runDemo("reset")}
+                disabled={demoBusy !== null || !hasDemo}
+              >
+                {demoBusy === "reset" ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <RotateCcw className="h-4 w-4" />
+                )}{" "}
+                Reset demo
+              </Button>
+            </div>
+          </div>
+          <p className="mt-2 text-xs text-ink-400">
+            Adds a sample goal and payment to your account only, clearly marked as demo. Reset
+            removes them.
+          </p>
           <ol className="mt-3 space-y-2">
             {steps.map((step, index) => (
               <li key={step.label}>
@@ -68,13 +176,17 @@ export function SavingsOverview({ onNavigate }: { onNavigate: (page: PageId) => 
                 >
                   <span
                     className={cn(
-                      'flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold',
-                      step.done ? 'bg-neon-500 text-night-950' : 'border border-white/20 text-ink-300',
+                      "flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold",
+                      step.done
+                        ? "bg-neon-500 text-night-950"
+                        : "border border-white/20 text-ink-300",
                     )}
                   >
                     {step.done ? <Check className="h-3.5 w-3.5" /> : index + 1}
                   </span>
-                  <span className={step.done ? 'text-ink-300 line-through' : 'text-ink-100'}>{step.label}</span>
+                  <span className={step.done ? "text-ink-300 line-through" : "text-ink-100"}>
+                    {step.label}
+                  </span>
                 </button>
               </li>
             ))}
@@ -87,14 +199,16 @@ export function SavingsOverview({ onNavigate }: { onNavigate: (page: PageId) => 
           <h2 className="flex items-center gap-2 text-lg font-bold text-ink-50">
             <Receipt className="h-5 w-5 text-aqua-300" /> Recent PayPal transactions
           </h2>
-          <Button variant="subtle" size="sm" onClick={() => onNavigate('vault')}>
+          <Button variant="subtle" size="sm" onClick={() => onNavigate("vault")}>
             Open vault <ArrowRight className="h-4 w-4" />
           </Button>
         </div>
         {transactions.isLoading ? (
           <Skeleton className="h-40" />
         ) : transactions.isError ? (
-          <p role="alert" className="text-sm text-rose-200">{transactions.error.message}</p>
+          <p role="alert" className="text-sm text-rose-200">
+            {transactions.error.message}
+          </p>
         ) : recent.length === 0 ? (
           <p className="rounded-xl border border-dashed border-white/15 p-6 text-center text-sm text-ink-300">
             No PayPal Sandbox payments yet. Your contributions and purchases will show here.
@@ -105,11 +219,14 @@ export function SavingsOverview({ onNavigate }: { onNavigate: (page: PageId) => 
               <li key={tx.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-ink-50">
-                    {tx.kind === 'goal_contribution'
-                      ? `Saved toward ${tx.goal_id ? goalNames[tx.goal_id] ?? 'a goal' : 'a goal'}`
-                      : tx.item_ids.map((id) => LOOT_BY_ID[id]?.name ?? id).join(', ') || 'Marketplace purchase'}
+                    {tx.kind === "goal_contribution"
+                      ? `Saved toward ${tx.goal_id ? (goalNames[tx.goal_id] ?? "a goal") : "a goal"}`
+                      : tx.item_ids.map((id) => LOOT_BY_ID[id]?.name ?? id).join(", ") ||
+                        "Marketplace purchase"}
                   </p>
-                  <p className="text-xs text-ink-400">{new Date(tx.created_at).toLocaleDateString('en-IN', { dateStyle: 'medium' })}</p>
+                  <p className="text-xs text-ink-400">
+                    {new Date(tx.created_at).toLocaleDateString("en-IN", { dateStyle: "medium" })}
+                  </p>
                 </div>
                 <div className="flex items-center gap-3">
                   <StatusPill status={tx.status} />

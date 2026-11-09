@@ -1,26 +1,43 @@
-import { useCallback, useState } from 'react';
-import { Bookmark, CheckCircle2, Lock, ShieldCheck, ShoppingBag, Trash2 } from 'lucide-react';
-import { Button } from '@/components/kit/Button';
-import { Toast } from '@/components/kit/Toast';
-import { EmptyState } from '@/components/kit/EmptyState';
-import { SandboxBadge } from '@/components/checkout/SandboxBadge';
-import { MonsterImage } from '@/components/monsters/MonsterImage';
-import { PurchaseGuardian } from '@/components/shop/PurchaseGuardian';
-import { ITEM_TYPE_LABEL, LOOT_BY_ID, LOOT_CATALOGUE, RARITY_CLASS, SHOP_ITEMS, type ItemType, type LootItem } from '@/lib/lootCatalogue';
-import { formatUsdCents } from '@/lib/money';
-import { useInventory } from '@/lib/ledger';
-import { cn } from '@/lib/cn';
-import { useGame } from '@/state/gameContext';
+import { useCallback, useState } from "react";
+import { Bookmark, CheckCircle2, Lock, ShieldCheck, ShoppingBag, Trash2 } from "lucide-react";
+import { Button } from "@/components/kit/Button";
+import { Toast } from "@/components/kit/Toast";
+import { EmptyState } from "@/components/kit/EmptyState";
+import { SandboxBadge } from "@/components/checkout/SandboxBadge";
+import { SetupNotice } from "@/components/checkout/SetupNotice";
+import { MonsterImage } from "@/components/monsters/MonsterImage";
+import { PurchaseGuardian } from "@/components/shop/PurchaseGuardian";
+import {
+  ITEM_TYPE_LABEL,
+  LOOT_BY_ID,
+  LOOT_CATALOGUE,
+  RARITY_CLASS,
+  SHOP_ITEMS,
+  type ItemType,
+  type LootItem,
+} from "@/lib/lootCatalogue";
+import { formatUsdCents } from "@/lib/money";
+import { useInventory } from "@/lib/ledger";
+import { cn } from "@/lib/cn";
+import { useGame } from "@/state/gameContext";
 
-type TypeFilter = 'all' | ItemType;
-const TYPE_FILTERS: TypeFilter[] = ['all', 'skin', 'accessory', 'effect', 'background', 'collection', 'seasonal'];
+type TypeFilter = "all" | ItemType;
+const TYPE_FILTERS: TypeFilter[] = [
+  "all",
+  "skin",
+  "accessory",
+  "effect",
+  "background",
+  "collection",
+  "seasonal",
+];
 const EARN_ONLY = LOOT_CATALOGUE.filter((item) => item.earnOnly);
 
 export function LootShopPage() {
   const { state, recordEvent, removeFromWishlist } = useGame();
   const inventory = useInventory();
   const [cart, setCart] = useState<string[]>([]);
-  const [filter, setFilter] = useState<TypeFilter>('all');
+  const [filter, setFilter] = useState<TypeFilter>("all");
   const [guardianOpen, setGuardianOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const dismissToast = useCallback(() => setToast(null), []);
@@ -28,23 +45,27 @@ export function LootShopPage() {
   const owned = new Set((inventory.data ?? []).map((entry) => entry.item_id));
   const cartItems = cart.map((id) => LOOT_BY_ID[id]).filter(Boolean);
   const cartTotal = cartItems.reduce((total, item) => total + item.priceUsdCents, 0);
-  const visible = SHOP_ITEMS.filter((item) => filter === 'all' || item.type === filter);
-  const wishlist = state.wishlist.map((id) => LOOT_BY_ID[id]).filter((item): item is LootItem => Boolean(item) && !item.earnOnly);
+  const visible = SHOP_ITEMS.filter((item) => filter === "all" || item.type === filter);
+  const wishlist = state.wishlist
+    .map((id) => LOOT_BY_ID[id])
+    .filter((item): item is LootItem => Boolean(item) && !item.earnOnly);
 
   const toggleItem = (id: string) => {
-    setCart((current) => (current.includes(id) ? current.filter((entry) => entry !== id) : [...current, id]));
+    setCart((current) =>
+      current.includes(id) ? current.filter((entry) => entry !== id) : [...current, id],
+    );
   };
 
   const abandonCart = () => {
-    recordEvent('cart_abandoned');
+    recordEvent("cart_abandoned");
     setCart([]);
-    setToast('Cart abandoned on purpose. Your wallet says thank you.');
+    setToast("Cart abandoned on purpose. Your wallet says thank you.");
   };
 
   const savedForLater = () => {
     setGuardianOpen(false);
     setCart([]);
-    setToast('Saved for later. Your wishlist is below whenever you are ready.');
+    setToast("Saved for later. Your wishlist is below whenever you are ready.");
   };
 
   return (
@@ -56,9 +77,13 @@ export function LootShopPage() {
         </div>
         <h1 className="text-3xl font-bold text-ink-50 sm:text-4xl">Dress up your monsters</h1>
         <p className="max-w-2xl text-sm text-ink-300">
-          Cosmetic items only, priced in US dollars. Every checkout is checked by the AI Purchase Guardian first and runs in PayPal Sandbox, so no real money moves. Items unlock only after PayPal confirms the payment.
+          Cosmetic items only, priced in US dollars. Every checkout is checked by the AI Purchase
+          Guardian first and runs in PayPal Sandbox, so no real money moves. Items unlock only after
+          PayPal confirms the payment.
         </p>
       </header>
+
+      <SetupNotice />
 
       <div className="flex flex-wrap gap-2" role="group" aria-label="Filter by item type">
         {TYPE_FILTERS.map((type) => (
@@ -68,11 +93,13 @@ export function LootShopPage() {
             onClick={() => setFilter(type)}
             aria-pressed={filter === type}
             className={cn(
-              'rounded-full border px-3 py-1.5 text-xs font-bold transition',
-              filter === type ? 'border-neon-400 bg-neon-500 text-night-950' : 'border-white/15 bg-white/5 text-ink-200 hover:border-white/30',
+              "rounded-full border px-3 py-1.5 text-xs font-bold transition",
+              filter === type
+                ? "border-neon-400 bg-neon-500 text-night-950"
+                : "border-white/15 bg-white/5 text-ink-200 hover:border-white/30",
             )}
           >
-            {type === 'all' ? 'All items' : ITEM_TYPE_LABEL[type]}
+            {type === "all" ? "All items" : ITEM_TYPE_LABEL[type]}
           </button>
         ))}
       </div>
@@ -97,7 +124,11 @@ export function LootShopPage() {
             </h2>
 
             {cartItems.length === 0 ? (
-              <EmptyState icon={<ShoppingBag className="h-6 w-6" />} title="Your cart is empty" description="Add an item to start a PayPal Sandbox checkout." />
+              <EmptyState
+                icon={<ShoppingBag className="h-6 w-6" />}
+                title="Your cart is empty"
+                description="Add an item to start a PayPal Sandbox checkout."
+              />
             ) : (
               <div className="mt-4 space-y-4">
                 <ul className="divide-y divide-white/10">
@@ -105,7 +136,9 @@ export function LootShopPage() {
                     <li key={item.id} className="flex items-center justify-between py-3 text-sm">
                       <span className="text-ink-100">{item.name}</span>
                       <span className="flex items-center gap-3">
-                        <span className="font-semibold text-ink-50">{formatUsdCents(item.priceUsdCents)}</span>
+                        <span className="font-semibold text-ink-50">
+                          {formatUsdCents(item.priceUsdCents)}
+                        </span>
                         <button
                           type="button"
                           onClick={() => toggleItem(item.id)}
@@ -139,11 +172,17 @@ export function LootShopPage() {
               <Bookmark className="h-5 w-5 text-volt-300" /> Saved for later
             </h2>
             {wishlist.length === 0 ? (
-              <p className="mt-3 text-sm text-ink-300">Nothing saved yet. Choose “Save for later” in the Purchase Guardian to park an item here.</p>
+              <p className="mt-3 text-sm text-ink-300">
+                Nothing saved yet. Choose “Save for later” in the Purchase Guardian to park an item
+                here.
+              </p>
             ) : (
               <ul className="mt-3 divide-y divide-white/10">
                 {wishlist.map((item) => (
-                  <li key={item.id} className="flex items-center justify-between gap-3 py-3 text-sm">
+                  <li
+                    key={item.id}
+                    className="flex items-center justify-between gap-3 py-3 text-sm"
+                  >
                     <span className="text-ink-100">{item.name}</span>
                     <span className="flex items-center gap-2">
                       {!owned.has(item.id) && !cart.includes(item.id) && (
@@ -171,7 +210,9 @@ export function LootShopPage() {
       <section className="space-y-4">
         <div>
           <h2 className="text-xl font-bold text-ink-50">Earned from savings</h2>
-          <p className="text-sm text-ink-300">These can’t be bought. They unlock when a savings goal passes a verified milestone.</p>
+          <p className="text-sm text-ink-300">
+            These can’t be bought. They unlock when a savings goal passes a verified milestone.
+          </p>
         </div>
         <div className="grid gap-4 sm:grid-cols-3">
           {EARN_ONLY.map((item) => (
@@ -180,25 +221,54 @@ export function LootShopPage() {
         </div>
       </section>
 
-      <PurchaseGuardian open={guardianOpen} itemIds={cart} onClose={() => setGuardianOpen(false)} onSavedForLater={savedForLater} />
+      <PurchaseGuardian
+        open={guardianOpen}
+        itemIds={cart}
+        onClose={() => setGuardianOpen(false)}
+        onSavedForLater={savedForLater}
+      />
       <Toast message={toast} onDismiss={dismissToast} />
     </div>
   );
 }
 
-function ItemCard({ item, owned, inCart, onToggle }: { item: LootItem; owned: boolean; inCart?: boolean; onToggle?: () => void }) {
+function ItemCard({
+  item,
+  owned,
+  inCart,
+  onToggle,
+}: {
+  item: LootItem;
+  owned: boolean;
+  inCart?: boolean;
+  onToggle?: () => void;
+}) {
   const Icon = item.icon;
   return (
     <article className="card flex flex-col gap-4 p-5">
-      <div className={cn('relative flex h-32 items-center justify-center overflow-hidden rounded-2xl ring-1', item.previewClass)}>
+      <div
+        className={cn(
+          "relative flex h-32 items-center justify-center overflow-hidden rounded-2xl ring-1",
+          item.previewClass,
+        )}
+      >
         <MonsterImage monsterId={item.previewMonster} stage={2} className="h-28 w-28" />
         <span className="absolute left-3 top-3 flex h-9 w-9 items-center justify-center rounded-xl bg-night-950/70 text-amber-300">
           <Icon className="h-4 w-4" />
         </span>
       </div>
       <div className="flex flex-wrap gap-2">
-        <span className={cn('rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider', RARITY_CLASS[item.rarity])}>{item.rarity}</span>
-        <span className="rounded-full bg-white/5 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-ink-400">{ITEM_TYPE_LABEL[item.type]}</span>
+        <span
+          className={cn(
+            "rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider",
+            RARITY_CLASS[item.rarity],
+          )}
+        >
+          {item.rarity}
+        </span>
+        <span className="rounded-full bg-white/5 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-ink-400">
+          {ITEM_TYPE_LABEL[item.type]}
+        </span>
       </div>
       <div className="flex-1">
         <h3 className="font-bold text-ink-50">{item.name}</h3>
@@ -208,7 +278,9 @@ function ItemCard({ item, owned, inCart, onToggle }: { item: LootItem; owned: bo
         {item.earnOnly ? (
           <p className="text-sm font-semibold text-volt-300">Savings reward</p>
         ) : (
-          <p className="font-display text-lg font-bold text-ink-50">{formatUsdCents(item.priceUsdCents)}</p>
+          <p className="font-display text-lg font-bold text-ink-50">
+            {formatUsdCents(item.priceUsdCents)}
+          </p>
         )}
         {owned ? (
           <span className="flex items-center gap-1 text-sm font-bold text-neon-300">
@@ -219,8 +291,8 @@ function ItemCard({ item, owned, inCart, onToggle }: { item: LootItem; owned: bo
             <Lock className="h-4 w-4" /> Locked
           </span>
         ) : (
-          <Button variant={inCart ? 'ghost' : 'primary'} size="sm" onClick={onToggle}>
-            {inCart ? 'Remove' : 'Add to cart'}
+          <Button variant={inCart ? "ghost" : "primary"} size="sm" onClick={onToggle}>
+            {inCart ? "Remove" : "Add to cart"}
           </Button>
         )}
       </div>

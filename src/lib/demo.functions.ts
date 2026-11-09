@@ -8,7 +8,8 @@ export type DemoResponse = { ok: true } | { ok: false; error: string };
 export const demoJourney = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { action: "start" | "reset" }) => {
-    if (!input || (input.action !== "start" && input.action !== "reset")) throw new Error("Unknown demo action.");
+    if (!input || (input.action !== "start" && input.action !== "reset"))
+      throw new Error("Unknown demo action.");
     return { action: input.action };
   })
   .handler(async ({ data, context }): Promise<DemoResponse> => {

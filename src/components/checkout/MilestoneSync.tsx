@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
-import { useGoalRewards, useTransactions } from '@/lib/ledger';
-import { pendingRewardClaims } from '@/lib/rewardClaims';
-import { useGame } from '@/state/gameContext';
+import { useEffect } from "react";
+import { useGoalRewards, useTransactions } from "@/lib/ledger";
+import { pendingRewardClaims } from "@/lib/rewardClaims";
+import { useGame } from "@/state/gameContext";
 
 /** Applies XP for verified contributions and granted milestones, once per server record. */
 export function MilestoneSync() {

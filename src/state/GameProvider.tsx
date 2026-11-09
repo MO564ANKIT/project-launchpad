@@ -1,9 +1,22 @@
-import { useCallback, useEffect, useMemo, useReducer, useRef, useState, type ReactNode } from 'react';
-import { gameReducer } from '@/state/gameReducer';
-import { GameContext, type ExpenseInput, type GameContextValue, type SyncStatus } from '@/state/gameContext';
-import { savePlayerState, SaveConflictError } from '@/lib/persistence';
-import { dateKey } from '@/lib/dates';
-import type { Expense, GameState } from '@/types';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+import { gameReducer } from "@/state/gameReducer";
+import {
+  GameContext,
+  type ExpenseInput,
+  type GameContextValue,
+  type SyncStatus,
+} from "@/state/gameContext";
+import { savePlayerState, SaveConflictError } from "@/lib/persistence";
+import { dateKey } from "@/lib/dates";
+import type { Expense, GameState } from "@/types";
 
 const SAVE_DELAY_MS = 600;
 
@@ -14,9 +27,14 @@ interface GameProviderProps {
   children: ReactNode;
 }
 
-export function GameProvider({ userId, initialState, initialVersion, children }: GameProviderProps) {
+export function GameProvider({
+  userId,
+  initialState,
+  initialVersion,
+  children,
+}: GameProviderProps) {
   const [state, dispatch] = useReducer(gameReducer, initialState);
-  const [syncStatus, setSyncStatus] = useState<SyncStatus>('ok');
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>("ok");
   const versionRef = useRef(initialVersion);
   const conflictRef = useRef(false);
   const queueRef = useRef<Promise<void>>(Promise.resolve());
@@ -28,13 +46,13 @@ export function GameProvider({ userId, initialState, initialVersion, children }:
         if (conflictRef.current) return;
         try {
           versionRef.current = await savePlayerState(userId, snapshot, versionRef.current);
-          setSyncStatus('ok');
+          setSyncStatus("ok");
         } catch (err) {
           if (err instanceof SaveConflictError) {
             conflictRef.current = true;
-            setSyncStatus('conflict');
+            setSyncStatus("conflict");
           } else {
-            setSyncStatus('error');
+            setSyncStatus("error");
           }
         }
       });
@@ -67,7 +85,7 @@ export function GameProvider({ userId, initialState, initialVersion, children }:
       syncStatus,
       addExpense: (input: ExpenseInput) =>
         dispatch({
-          type: 'addExpense',
+          type: "addExpense",
           at: now(),
           expense: {
             ...input,
@@ -76,20 +94,21 @@ export function GameProvider({ userId, initialState, initialVersion, children }:
             createdAt: now(),
           } satisfies Expense,
         }),
-      updateExpense: (id, input) => dispatch({ type: 'updateExpense', id, at: now(), patch: input }),
-      deleteExpense: (id) => dispatch({ type: 'deleteExpense', id, at: now() }),
+      updateExpense: (id, input) =>
+        dispatch({ type: "updateExpense", id, at: now(), patch: input }),
+      deleteExpense: (id) => dispatch({ type: "deleteExpense", id, at: now() }),
       saveBudgets: (monthlyBudgetPaise, categoryBudgetsPaise) =>
-        dispatch({ type: 'saveBudgets', at: now(), monthlyBudgetPaise, categoryBudgetsPaise }),
-      recordEvent: (eventType) => dispatch({ type: 'recordEvent', at: now(), eventType }),
-      saveForLater: (itemIds) => dispatch({ type: 'saveForLater', at: now(), itemIds }),
-      removeFromWishlist: (itemId) => dispatch({ type: 'removeFromWishlist', at: now(), itemId }),
-      claimRewards: (rewards) => dispatch({ type: 'claimRewards', at: now(), rewards }),
-      startQuest: (questId) => dispatch({ type: 'startQuest', at: now(), questId }),
-      claimQuest: (questId) => dispatch({ type: 'claimQuest', at: now(), questId }),
-      setFeatured: (monsterId) => dispatch({ type: 'setFeatured', at: now(), monsterId }),
-      resetDemo: () => dispatch({ type: 'resetDemo', at: now() }),
-      clearSampleData: () => dispatch({ type: 'clearSampleData', at: now() }),
-      clearAll: () => dispatch({ type: 'clearAll', at: now() }),
+        dispatch({ type: "saveBudgets", at: now(), monthlyBudgetPaise, categoryBudgetsPaise }),
+      recordEvent: (eventType) => dispatch({ type: "recordEvent", at: now(), eventType }),
+      saveForLater: (itemIds) => dispatch({ type: "saveForLater", at: now(), itemIds }),
+      removeFromWishlist: (itemId) => dispatch({ type: "removeFromWishlist", at: now(), itemId }),
+      claimRewards: (rewards) => dispatch({ type: "claimRewards", at: now(), rewards }),
+      startQuest: (questId) => dispatch({ type: "startQuest", at: now(), questId }),
+      claimQuest: (questId) => dispatch({ type: "claimQuest", at: now(), questId }),
+      setFeatured: (monsterId) => dispatch({ type: "setFeatured", at: now(), monsterId }),
+      resetDemo: () => dispatch({ type: "resetDemo", at: now() }),
+      clearSampleData: () => dispatch({ type: "clearSampleData", at: now() }),
+      clearAll: () => dispatch({ type: "clearAll", at: now() }),
     };
   }, [state, syncStatus]);
 

@@ -1,27 +1,30 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
-import type { Session } from '@supabase/supabase-js';
-import { AuthContext, type AuthContextValue } from '@/state/authContext';
-import { supabase } from '@/lib/supabase';
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import type { Session } from "@supabase/supabase-js";
+import { AuthContext, type AuthContextValue } from "@/state/authContext";
+import { supabase } from "@/lib/supabase";
 
 function friendlyAuthError(message: string): string {
   const lower = message.toLowerCase();
-  if (lower.includes('already registered') || lower.includes('already been registered')) {
-    return 'An account with this email already exists. Try signing in instead.';
+  if (lower.includes("already registered") || lower.includes("already been registered")) {
+    return "An account with this email already exists. Try signing in instead.";
   }
-  if (lower.includes('email not confirmed')) {
-    return 'Please confirm your email first. Check your inbox for the confirmation link.';
+  if (lower.includes("email not confirmed")) {
+    return "Please confirm your email first. Check your inbox for the confirmation link.";
   }
-  if (lower.includes('invalid login credentials')) {
+  if (lower.includes("invalid login credentials")) {
     return 'Email or password is incorrect. Played Spendemon before the move? Use "Forgot or new password" to set one.';
   }
-  if (lower.includes('email address') && (lower.includes('not allowed') || lower.includes('invalid'))) {
-    return 'Use a real email address you can open. We send a link to confirm it.';
+  if (
+    lower.includes("email address") &&
+    (lower.includes("not allowed") || lower.includes("invalid"))
+  ) {
+    return "Use a real email address you can open. We send a link to confirm it.";
   }
-  if (lower.includes('rate limit') || lower.includes('too many')) {
-    return 'Too many attempts. Please wait a minute and try again.';
+  if (lower.includes("rate limit") || lower.includes("too many")) {
+    return "Too many attempts. Please wait a minute and try again.";
   }
-  if (lower.includes('password')) return 'Use a password with at least 6 characters.';
-  return 'Something went wrong. Please check your connection and try again.';
+  if (lower.includes("password")) return "Use a password with at least 6 characters.";
+  return "Something went wrong. Please check your connection and try again.";
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -60,7 +63,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
         if (error) return { error: friendlyAuthError(error.message) };
         if (!data.session) {
-          return { notice: `We sent a confirmation link to ${email}. Open it to finish creating your account.` };
+          return {
+            notice: `We sent a confirmation link to ${email}. Open it to finish creating your account.`,
+          };
         }
         return {};
       },

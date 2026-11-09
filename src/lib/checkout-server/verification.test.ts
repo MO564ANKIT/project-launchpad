@@ -3,7 +3,9 @@ import { verifyPayment, type PaypalOrderBody } from "./verification";
 
 const expected = { amountCents: 3499, currency: "USD" };
 
-function completedBody(overrides: { value?: string; currency?: string; status?: string } = {}): PaypalOrderBody {
+function completedBody(
+  overrides: { value?: string; currency?: string; status?: string } = {},
+): PaypalOrderBody {
   return {
     id: "ORDER123456789",
     status: "COMPLETED",
@@ -14,7 +16,10 @@ function completedBody(overrides: { value?: string; currency?: string; status?: 
             {
               id: "CAPTURE123",
               status: overrides.status ?? "COMPLETED",
-              amount: { value: overrides.value ?? "34.99", currency_code: overrides.currency ?? "USD" },
+              amount: {
+                value: overrides.value ?? "34.99",
+                currency_code: overrides.currency ?? "USD",
+              },
             },
           ],
         },
@@ -53,7 +58,9 @@ describe("verifyPayment", () => {
 
   it("treats a missing or malformed PayPal reply as unverified", () => {
     expect(verifyPayment(null, expected).verified).toBe(false);
-    expect(verifyPayment({ status: "COMPLETED", purchase_units: [] }, expected).verified).toBe(false);
+    expect(verifyPayment({ status: "COMPLETED", purchase_units: [] }, expected).verified).toBe(
+      false,
+    );
     expect(verifyPayment(completedBody({ value: "34.9" }), expected).verified).toBe(false);
   });
 });

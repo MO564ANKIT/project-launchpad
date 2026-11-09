@@ -1,18 +1,19 @@
-import type { Category } from '@/lib/categories';
+import type { Category } from "@/lib/categories";
 
-export type MonsterId = 'shopzilla' | 'coffeeling' | 'munchlord' | 'saverion' | 'napcoin' | 'impulso';
+export type MonsterId =
+  "shopzilla" | "coffeeling" | "munchlord" | "saverion" | "napcoin" | "impulso";
 
 export type EventType =
-  | 'expense_logged'
-  | 'simulation'
-  | 'purchase_skipped'
-  | 'cart_abandoned'
-  | 'purchase_completed'
-  | 'quest_completed'
-  | 'goal_contribution'
-  | 'milestone_reached'
-  | 'spending_reviewed'
-  | 'purchase_reconsidered';
+  | "expense_logged"
+  | "simulation"
+  | "purchase_skipped"
+  | "cart_abandoned"
+  | "purchase_completed"
+  | "quest_completed"
+  | "goal_contribution"
+  | "milestone_reached"
+  | "spending_reviewed"
+  | "purchase_reconsidered";
 
 export interface Expense {
   id: string;
@@ -36,7 +37,7 @@ export interface MonsterProgress {
 }
 
 export interface QuestRecord {
-  status: 'active' | 'completed';
+  status: "active" | "completed";
   startedAt: string;
   completedAt: string | null;
 }
