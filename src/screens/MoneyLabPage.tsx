@@ -93,7 +93,7 @@ export function MoneyLabPage() {
               label="Price of the thing"
               htmlFor="lab-amount"
               error={amountError}
-              hint="Indian rupees, for example 2499 or 2,499.50"
+              hint="US dollars, for example 2499 or 2,499.50"
             >
               <input
                 id="lab-amount"

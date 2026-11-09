@@ -131,7 +131,7 @@ export function PurchaseGuardian({
                 </span>
               </div>
               <dl className="mt-4 grid gap-3 sm:grid-cols-3">
-                <Fact label="Price (approx.)" value={formatMoney(result.facts.priceInrPaise)} />
+                <Fact label="Price (approx.)" value={formatMoney(result.facts.priceBudgetCents)} />
                 <Fact
                   label={`${result.facts.categoryLabel} left`}
                   value={
@@ -160,8 +160,7 @@ export function PurchaseGuardian({
                 />
               </dl>
               <p className="mt-3 text-xs text-ink-400">
-                Calculated on our server from your saved budget. US$ prices are converted at a fixed
-                reference rate of ₹83 per US$.
+                Calculated from your saved budget. Prices and budgets are all in USD.
               </p>
             </section>
 

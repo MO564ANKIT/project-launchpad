@@ -2,28 +2,28 @@ export const MAX_AMOUNT_PAISE = 1_000_000_000;
 
 const AMOUNT_PATTERN = /^\d{1,9}(\.\d{1,2})?$/;
 
-const wholeRupeeFormatter = new Intl.NumberFormat("en-IN", {
+const wholeDollarFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
-  currency: "INR",
+  currency: "USD",
   maximumFractionDigits: 0,
 });
 
-const preciseRupeeFormatter = new Intl.NumberFormat("en-IN", {
+const preciseDollarFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
-  currency: "INR",
+  currency: "USD",
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 });
 
 export function parseAmountToPaise(input: string): number | null {
-  const cleaned = input.replace(/[,\s\u20B9]/g, "");
+  const cleaned = input.replace(/[,\s$]/g, "");
   if (!AMOUNT_PATTERN.test(cleaned)) return null;
   const paise = Math.round(Number(cleaned) * 100);
   return paise <= MAX_AMOUNT_PAISE ? paise : null;
 }
 
 export function formatMoney(paise: number): string {
-  const formatter = paise % 100 === 0 ? wholeRupeeFormatter : preciseRupeeFormatter;
+  const formatter = paise % 100 === 0 ? wholeDollarFormatter : preciseDollarFormatter;
   return formatter.format(paise / 100);
 }
 

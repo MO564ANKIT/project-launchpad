@@ -3,7 +3,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export interface GuardianFactsDto {
   priceUsdCents: number;
-  priceInrPaise: number;
+  priceBudgetCents: number;
   categoryLabel: string;
   categoryBudgetPaise: number | null;
   categoryRemainingPaise: number | null;

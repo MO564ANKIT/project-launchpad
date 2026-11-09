@@ -57,14 +57,14 @@ export function ExpenseForm({ initial, today, onSubmit, onCancel }: ExpenseFormP
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-5">
       <FormField
-        label="Amount (INR)"
+        label="Amount (USD)"
         htmlFor="expense-amount"
         error={errors.amount}
-        hint="Use paise for fractions, e.g. 99.50"
+        hint="Use cents for fractions, e.g. 99.50"
       >
         <div className="relative">
           <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 font-bold text-ink-300">
-            ₹
+            $
           </span>
           <input
             id="expense-amount"
