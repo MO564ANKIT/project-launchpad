@@ -3,6 +3,7 @@ import { Bookmark, Loader2, ShieldCheck, X } from 'lucide-react';
 import { Button } from '@/components/kit/Button';
 import { Modal } from '@/components/kit/Modal';
 import { SandboxBadge } from '@/components/checkout/SandboxBadge';
+import { TestModeNote } from '@/components/checkout/SetupNotice';
 import { LOOT_BY_ID } from '@/lib/lootCatalogue';
 import { formatMoney, formatUsdCents } from '@/lib/money';
 import { purchaseGuardian, type GuardianResponse } from '@/lib/financeAi.functions';
@@ -85,7 +86,7 @@ export function PurchaseGuardian({ open, itemIds, onClose, onSavedForLater }: Pu
 
         {!result && !error && (
           <div className="flex items-center gap-3 rounded-2xl bg-night-950/50 p-5 text-sm text-ink-300" role="status">
-            <Loader2 className="h-5 w-5 animate-spin text-volt-300" /> Checking this against your recorded budget...
+            <Loader2 className="h-5 w-5 animate-spin text-volt-300" /> Checking this against your recorded budget... You don't have to wait; you can continue to PayPal any time.
           </div>
         )}
 
@@ -119,9 +120,12 @@ export function PurchaseGuardian({ open, itemIds, onClose, onSavedForLater }: Pu
             </section>
 
             <section className="rounded-2xl border border-volt-500/30 bg-volt-500/10 p-5">
-              <h3 className="text-sm font-bold uppercase tracking-wider text-volt-300">
-                {result.explanationSource === 'ai' ? 'AI explanation' : 'Guardian explanation (AI unavailable)'}
+              <h3 className="flex flex-wrap items-center gap-2 text-sm font-bold uppercase tracking-wider text-volt-300">
+                {result.explanationSource === 'ai' ? 'AI explanation' : 'Calculated fallback'}
               </h3>
+              {result.explanationSource !== 'ai' && (
+                <p className="mt-1 text-xs text-ink-400">The AI was unavailable, so this explanation was calculated from your budget numbers.</p>
+              )}
               <p className="mt-2 text-sm leading-relaxed text-ink-100">{result.explanation}</p>
               {result.alternative && LOOT_BY_ID[result.alternative.itemId] && (
                 <p className="mt-3 text-sm text-ink-200">
@@ -139,8 +143,10 @@ export function PurchaseGuardian({ open, itemIds, onClose, onSavedForLater }: Pu
           </p>
         )}
 
+        <TestModeNote />
+
         <div className="grid gap-2 sm:grid-cols-3">
-          <Button variant="primary" onClick={pay} disabled={paying || (!result && !error)}>
+          <Button variant="primary" onClick={pay} disabled={paying}>
             {paying ? 'Opening PayPal...' : 'Continue to PayPal'}
           </Button>
           <Button variant="volt" onClick={later} disabled={paying}>

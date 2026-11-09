@@ -1,6 +1,8 @@
 import { PiggyBank } from 'lucide-react';
 import { EmptyState } from '@/components/kit/EmptyState';
 import { SandboxBadge } from '@/components/checkout/SandboxBadge';
+import { SetupNotice } from '@/components/checkout/SetupNotice';
+import { splitGoals } from '@/lib/vault';
 import { CreateGoalForm } from '@/components/goals/CreateGoalForm';
 import { GoalCard } from '@/components/goals/GoalCard';
 import { MonsterProgressCard } from '@/components/goals/MonsterProgressCard';
@@ -11,6 +13,15 @@ export function GoalsPage() {
   const goals = useGoals();
   const rewards = useGoalRewards();
   const transactions = useTransactions();
+  const { active, completed } = splitGoals(goals.data ?? []);
+  const card = (goal: (typeof active)[number]) => (
+    <GoalCard
+      key={goal.id}
+      goal={goal}
+      rewards={(rewards.data ?? []).filter((reward) => reward.goal_id === goal.id)}
+      contributions={(transactions.data ?? []).filter((tx) => tx.goal_id === goal.id)}
+    />
+  );
 
   return (
     <div className="space-y-8">
@@ -25,6 +36,8 @@ export function GoalsPage() {
         </p>
       </header>
 
+      <SetupNotice />
+
       <div className="grid gap-6 lg:grid-cols-5">
         <div className="space-y-6 lg:col-span-3">
           {goals.isLoading ? (
@@ -33,21 +46,23 @@ export function GoalsPage() {
             <p role="alert" className="card p-6 text-sm text-rose-300">
               {goals.error.message}
             </p>
-          ) : goals.data && goals.data.length > 0 ? (
-            goals.data.map((goal) => (
-              <GoalCard
-                key={goal.id}
-                goal={goal}
-                rewards={(rewards.data ?? []).filter((reward) => reward.goal_id === goal.id)}
-                contributions={(transactions.data ?? []).filter((tx) => tx.goal_id === goal.id)}
-              />
-            ))
+          ) : active.length > 0 ? (
+            active.map(card)
           ) : (
             <EmptyState
               icon={<PiggyBank className="h-6 w-6" />}
-              title="No savings goals yet"
-              description="Create your first goal to start leveling up with verified PayPal Sandbox contributions."
+              title={completed.length ? 'No active goals' : 'No savings goals yet'}
+              description={completed.length ? 'Every goal is complete. Create a new one to keep Saverion growing.' : 'Create your first goal to start leveling up with verified PayPal Sandbox contributions.'}
             />
+          )}
+
+          {completed.length > 0 && (
+            <section aria-labelledby="completed-goals" className="space-y-4 border-t border-white/10 pt-6">
+              <h2 id="completed-goals" className="text-lg font-bold text-ink-50">
+                Completed goals <span className="text-sm font-medium text-ink-400">({completed.length})</span>
+              </h2>
+              {completed.map(card)}
+            </section>
           )}
         </div>
         <aside className="space-y-6 lg:col-span-2">
