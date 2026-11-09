@@ -1,24 +1,41 @@
-# Archived App Bloom
+# Spendemon: Pay. Save. Evolve.
 
-/skill:migrate-external-project Source: code archive. Migrate the attached project into Lovable.
+A budgeting game. You log spending, stay under budget, and your monsters level up. Savings goals are funded through **PayPal Sandbox** (test money only), and a payment counts only after the server has checked it with PayPal.
 
-This project was built with [Lovable](https://lovable.dev).
+## For judges: 3-minute tour
 
-## Build with Lovable
+1. **Sign up** with email and password, then confirm your email.
+2. The **guided tour** opens on first sign-in. It shows the dashboard, expenses, goals and the Marketplace.
+3. On the dashboard, press **Start demo**. This adds a sample goal and a verified sample payment to *your own account only*, marked as demo. **Reset demo** removes them.
+4. **Goals** (`/goals`): active goals with progress rings and milestones; finished goals sit in a separate **Completed goals** section.
+5. **Vault** (`/vault`): every PayPal payment. Filter by type, status and **date**, and tap a row to open the side panel with a **status timeline**.
+6. **Marketplace** (`/loot-shop`): pick an item to open the **AI Purchase Guardian**. It labels its advice **AI explanation** or **Calculated fallback**. The pay button works straight away and never waits for the AI.
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/b9e8f87b-798c-4fc1-8945-70923e3c9a53).
+A full walkthrough script is in [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md).
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+## What is real and what is simulated
 
-## Development
+| Area | Status |
+| --- | --- |
+| Accounts, saves, goals, orders | Real, stored in Lovable Cloud with per-player access rules |
+| PayPal | **Sandbox only.** No real money moves. The server verifies each capture before crediting it |
+| Demo journey | Sample rows flagged `is_demo`, never counted in "Total saved via PayPal" |
+| AI (Guardian, insights, roast chat) | Live when the AI key is set; otherwise a calculated fallback, clearly labelled |
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+If the PayPal Sandbox keys are not configured, Goals and the Marketplace show a **"Sandbox setup needed"** notice and checkout is paused. Demo mode still works.
+
+## Tech
+
+TanStack Start (React 19), Tailwind CSS v4, Lovable Cloud (database and auth), server functions for payments and AI.
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
+bun install
+bun run dev      # local dev server
+bun run test     # unit tests (vitest)
+bun run lint
+bun run build
 ```
+
+Server-side secrets: `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, `PAYPAL_WEBHOOK_ID`, `GEMINI_API_KEY`. None of them ever reach the browser.
+
+Health check: `GET /api/public/paypal-health` returns only true/false readiness flags.
