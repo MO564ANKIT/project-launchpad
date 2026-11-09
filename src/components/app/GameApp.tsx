@@ -6,6 +6,7 @@ import { BottomNav } from '@/components/layout/BottomNav';
 import { AuthScreen } from '@/components/auth/AuthScreen';
 import { PaypalReturn } from '@/components/checkout/PaypalReturn';
 import { MilestoneSync } from '@/components/checkout/MilestoneSync';
+import { GuidedTour } from '@/components/app/GuidedTour';
 import { Button } from '@/components/kit/Button';
 import { usePageNavigate } from '@/components/app/usePageNavigate';
 import { useAuth } from '@/state/authContext';
@@ -15,7 +16,7 @@ import { loadPlayerState, type LoadedPlayerState } from '@/lib/persistence';
 import { finalizeState } from '@/lib/progress';
 import { pageFromPath } from '@/lib/pageRoutes';
 
-function AppShell({ children }: { children: ReactNode }) {
+function AppShell({ children, userId }: { children: ReactNode; userId: string }) {
   const { syncStatus } = useGame();
   const pathname = useLocation({ select: (location) => location.pathname });
   const navigate = usePageNavigate();
@@ -45,6 +46,7 @@ function AppShell({ children }: { children: ReactNode }) {
       <BottomNav page={pageFromPath(pathname)} onNavigate={navigate} />
       <PaypalReturn />
       <MilestoneSync />
+      <GuidedTour userId={userId} />
     </div>
   );
 }
@@ -99,7 +101,7 @@ function PlayerGame({ userId, children }: { userId: string; children: ReactNode 
 
   return (
     <GameProvider key={userId} userId={userId} initialState={loaded.state} initialVersion={loaded.version}>
-      <AppShell>{children}</AppShell>
+      <AppShell userId={userId}>{children}</AppShell>
     </GameProvider>
   );
 }
