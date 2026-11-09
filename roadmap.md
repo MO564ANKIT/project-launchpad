@@ -19,3 +19,14 @@
 - [ ] 4. Reliability: install/build/lint/tests, pin loose deps, new tests, per-route error boundaries
 - [ ] 5. Docs: README for judges, roadmap, docs/DEMO_SCRIPT.md
 - [ ] 6. UI polish: 360px mobile, skeletons/empty states/toasts, monster assets
+
+## Phase 2b — current request
+- [ ] Setup notice on Goals + Marketplace; test-mode note in Purchase Guardian
+- [ ] Goals: completed-goals section
+- [ ] Vault: date filter + side panel with status timeline
+- [ ] Dashboard: total saved via PayPal
+- [ ] Guardian: AI vs calculated labels; pay button never waits
+- [ ] Demo: Start/Reset demo buttons + first-run tour
+- [ ] Reliability: pin deps, 4 tests, per-route error screen, build/lint/test
+- [ ] Docs: README, docs/DEMO_SCRIPT.md, roadmap update
+- [ ] Mobile check at 360px
