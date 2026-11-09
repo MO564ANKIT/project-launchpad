@@ -16,7 +16,7 @@ export function StreakWeek({ events, todayKey, streak, onLogToday }: StreakWeekP
   const loggedToday = days[days.length - 1].active;
 
   return (
-    <section className="card p-6 sm:p-8">
+    <section className="card p-4 sm:p-8">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <h2 className="flex items-center gap-2 text-lg font-bold text-ink-50">
           <Flame className="h-5 w-5 text-amber-300" /> {streak} day streak

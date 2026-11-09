@@ -212,7 +212,7 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-12">
-        <div className="lg:col-span-5">
+        <div className="min-w-0 lg:col-span-5">
           <StreakWeek
             events={state.events}
             todayKey={today}
