@@ -41,6 +41,7 @@ export interface CheckoutBody {
   amountCents?: number;
   milestones?: number[];
   message?: string;
+  alreadyCompleted?: boolean;
 }
 
 export type CheckoutResult = { ok: true; body: CheckoutBody } | { ok: false; error: string };
@@ -67,31 +68,29 @@ export function paypalConfigured(): boolean {
   return paypalSetupStatus(process.env).checkoutReady;
 }
 
+// Gateway credentials stay server-side; PayPal access tokens are managed by the connector.
 export async function getAccessToken(): Promise<string> {
-  const clientId = process.env["PAYPAL_CLIENT_ID"];
-  const clientSecret = process.env["PAYPAL_CLIENT_SECRET"];
-  if (!clientId || !clientSecret) throw new Error("PayPal credentials are not configured");
+  const key = process.env["LOVABLE_API_KEY"];
+  if (!key || !process.env["PAYPAL_API_KEY"]) throw new Error("PayPal connection is not configured");
+  return key;
+}
 
-  const response = await fetch(`${PAYPAL_API}/v1/oauth2/token`, {
-    method: "POST",
-    headers: {
-      Authorization: `Basic ${btoa(`${clientId}:${clientSecret}`)}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: "grant_type=client_credentials",
-  });
-  const data = await response.json().catch(() => null);
-  if (!response.ok || typeof data?.access_token !== "string") {
-    throw new Error(`PayPal authentication failed (${response.status})`);
-  }
-  return data.access_token;
+export async function paypalFetch(path: string, init: RequestInit = {}): Promise<Response> {
+  const token = await getAccessToken();
+  const headers = new Headers(init.headers);
+  headers.set("Authorization", `Bearer ${token}`);
+  headers.set("X-Connection-Api-Key", process.env["PAYPAL_API_KEY"] ?? "");
+  headers.set("Content-Type", "application/json");
+  const response = await fetch(`https://connector-gateway.lovable.dev/paypal${path}`, { ...init, headers });
+  if (!response.ok) console.error("PayPal request failed", response.status, await response.clone().text());
+  return response;
 }
 
 async function fetchPaypalOrder(
   accessToken: string,
   orderId: string,
 ): Promise<PaypalOrderBody | null> {
-  const response = await fetch(`${PAYPAL_API}/v2/checkout/orders/${orderId}`, {
+  const response = await paypalFetch(`/v2/checkout/orders/${orderId}`, {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
   return response.ok ? await response.json().catch(() => null) : null;
@@ -124,7 +123,7 @@ async function startPaypalOrder(
   req: PaypalOrderRequest,
 ): Promise<{ id: string; approveUrl: string } | null> {
   const accessToken = await getAccessToken();
-  const response = await fetch(`${PAYPAL_API}/v2/checkout/orders`, {
+  const response = await paypalFetch(`/v2/checkout/orders`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -352,7 +351,7 @@ export async function captureOrder(
     if (row.status === "completed") {
       const milestones =
         row.kind === "goal_contribution" ? await milestonesForOrder(db, orderId) : [];
-      return ok(completedBody(row, milestones));
+      return ok({ ...completedBody(row, milestones), alreadyCompleted: true });
     }
     if (row.status === "capturing")
       return ok({ status: "pending", orderId, kind: row.kind, message: PENDING_MESSAGE });
@@ -366,7 +365,7 @@ export async function captureOrder(
 
   const order = claimed as OrderRow;
   const accessToken = await getAccessToken();
-  const captureResponse = await fetch(`${PAYPAL_API}/v2/checkout/orders/${orderId}/capture`, {
+  const captureResponse = await paypalFetch(`/v2/checkout/orders/${orderId}/capture`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken}`,

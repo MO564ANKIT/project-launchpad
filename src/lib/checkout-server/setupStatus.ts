@@ -17,11 +17,12 @@ const present = (value: string | undefined) => typeof value === "string" && valu
 
 export function paypalSetupStatus(env: Env): PaypalSetupStatus {
   const clientId = present(env["PAYPAL_CLIENT_ID"]);
-  const clientSecret = present(env["PAYPAL_CLIENT_SECRET"]);
+  const clientSecret = present(env["PAYPAL_API_KEY"]) && present(env["LOVABLE_API_KEY"]);
   const webhookId = present(env["PAYPAL_WEBHOOK_ID"]);
   const missing = [
     !clientId && "PAYPAL_CLIENT_ID",
-    !clientSecret && "PAYPAL_CLIENT_SECRET",
+    !present(env["PAYPAL_API_KEY"]) && "PAYPAL_API_KEY",
+    !present(env["LOVABLE_API_KEY"]) && "LOVABLE_API_KEY",
     !webhookId && "PAYPAL_WEBHOOK_ID",
   ].filter((name): name is string => Boolean(name));
   return {

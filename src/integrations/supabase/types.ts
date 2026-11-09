@@ -193,6 +193,7 @@ export type Database = {
           kind: string
           paypal_capture_id: string | null
           paypal_order_id: string
+          refund_reversed_at: string | null
           status: string
           updated_at: string
           user_id: string | null
@@ -210,6 +211,7 @@ export type Database = {
           kind?: string
           paypal_capture_id?: string | null
           paypal_order_id: string
+          refund_reversed_at?: string | null
           status?: string
           updated_at?: string
           user_id?: string | null
@@ -227,6 +229,7 @@ export type Database = {
           kind?: string
           paypal_capture_id?: string | null
           paypal_order_id?: string
+          refund_reversed_at?: string | null
           status?: string
           updated_at?: string
           user_id?: string | null
@@ -286,6 +289,7 @@ export type Database = {
         Returns: Json
       }
       reset_demo_journey: { Args: { _user_id: string }; Returns: undefined }
+      reverse_paypal_order: { Args: { _capture_id: string }; Returns: Json }
       start_demo_journey: { Args: { _user_id: string }; Returns: Json }
     }
     Enums: {
