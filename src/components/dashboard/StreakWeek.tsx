@@ -31,7 +31,7 @@ export function StreakWeek({ events, todayKey, streak, onLogToday }: StreakWeekP
         {days.map((day) => (
           <li key={day.key} className="flex flex-col items-center gap-2">
             <span
-              className={`flex h-12 w-12 items-center justify-center rounded-full border-2 transition duration-300 sm:h-14 sm:w-14 ${
+              className={`flex h-9 w-9 sm:h-12 sm:w-12 items-center justify-center rounded-full border-2 transition duration-300 md:h-14 md:w-14 ${
                 day.active
                   ? "border-amber-400 bg-amber-500/20 text-amber-300 shadow-glow-amber"
                   : "border-white/10 bg-night-950/60 text-ink-500"
