@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1794218198285,
+      "tag": "0000_spendemon_base",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794218222790,
+      "tag": "0001_paypal_save_to_level",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794218231325,
+      "tag": "0002_demo_journey",
+      "breakpoints": true
+    }
+  ]
+}

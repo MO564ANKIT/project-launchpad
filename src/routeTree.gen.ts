@@ -10,33 +10,180 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ExpensesRouteImport } from './routes/expenses'
+import { Route as GoalsRouteImport } from './routes/goals'
+import { Route as LootShopRouteImport } from './routes/loot-shop'
+import { Route as MoneyLabRouteImport } from './routes/money-lab'
+import { Route as MonstersRouteImport } from './routes/monsters'
+import { Route as QuestsRouteImport } from './routes/quests'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as RoastRouteImport } from './routes/roast'
+import { Route as VaultRouteImport } from './routes/vault'
+import { Route as ApiPublicPaypalHealthRouteImport } from './routes/api/public/paypal-health'
+import { Route as ApiPublicPaypalWebhookRouteImport } from './routes/api/public/paypal-webhook'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExpensesRoute = ExpensesRouteImport.update({
+  id: '/expenses',
+  path: '/expenses',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GoalsRoute = GoalsRouteImport.update({
+  id: '/goals',
+  path: '/goals',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LootShopRoute = LootShopRouteImport.update({
+  id: '/loot-shop',
+  path: '/loot-shop',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MoneyLabRoute = MoneyLabRouteImport.update({
+  id: '/money-lab',
+  path: '/money-lab',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MonstersRoute = MonstersRouteImport.update({
+  id: '/monsters',
+  path: '/monsters',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QuestsRoute = QuestsRouteImport.update({
+  id: '/quests',
+  path: '/quests',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RoastRoute = RoastRouteImport.update({
+  id: '/roast',
+  path: '/roast',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VaultRoute = VaultRouteImport.update({
+  id: '/vault',
+  path: '/vault',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicPaypalHealthRoute = ApiPublicPaypalHealthRouteImport.update({
+  id: '/api/public/paypal-health',
+  path: '/api/public/paypal-health',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicPaypalWebhookRoute = ApiPublicPaypalWebhookRouteImport.update({
+  id: '/api/public/paypal-webhook',
+  path: '/api/public/paypal-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/expenses': typeof ExpensesRoute
+  '/goals': typeof GoalsRoute
+  '/loot-shop': typeof LootShopRoute
+  '/money-lab': typeof MoneyLabRoute
+  '/monsters': typeof MonstersRoute
+  '/quests': typeof QuestsRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/roast': typeof RoastRoute
+  '/vault': typeof VaultRoute
+  '/api/public/paypal-health': typeof ApiPublicPaypalHealthRoute
+  '/api/public/paypal-webhook': typeof ApiPublicPaypalWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/expenses': typeof ExpensesRoute
+  '/goals': typeof GoalsRoute
+  '/loot-shop': typeof LootShopRoute
+  '/money-lab': typeof MoneyLabRoute
+  '/monsters': typeof MonstersRoute
+  '/quests': typeof QuestsRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/roast': typeof RoastRoute
+  '/vault': typeof VaultRoute
+  '/api/public/paypal-health': typeof ApiPublicPaypalHealthRoute
+  '/api/public/paypal-webhook': typeof ApiPublicPaypalWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/expenses': typeof ExpensesRoute
+  '/goals': typeof GoalsRoute
+  '/loot-shop': typeof LootShopRoute
+  '/money-lab': typeof MoneyLabRoute
+  '/monsters': typeof MonstersRoute
+  '/quests': typeof QuestsRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/roast': typeof RoastRoute
+  '/vault': typeof VaultRoute
+  '/api/public/paypal-health': typeof ApiPublicPaypalHealthRoute
+  '/api/public/paypal-webhook': typeof ApiPublicPaypalWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/expenses'
+    | '/goals'
+    | '/loot-shop'
+    | '/money-lab'
+    | '/monsters'
+    | '/quests'
+    | '/reset-password'
+    | '/roast'
+    | '/vault'
+    | '/api/public/paypal-health'
+    | '/api/public/paypal-webhook'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/expenses'
+    | '/goals'
+    | '/loot-shop'
+    | '/money-lab'
+    | '/monsters'
+    | '/quests'
+    | '/reset-password'
+    | '/roast'
+    | '/vault'
+    | '/api/public/paypal-health'
+    | '/api/public/paypal-webhook'
+  id:
+    | '__root__'
+    | '/'
+    | '/expenses'
+    | '/goals'
+    | '/loot-shop'
+    | '/money-lab'
+    | '/monsters'
+    | '/quests'
+    | '/reset-password'
+    | '/roast'
+    | '/vault'
+    | '/api/public/paypal-health'
+    | '/api/public/paypal-webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ExpensesRoute: typeof ExpensesRoute
+  GoalsRoute: typeof GoalsRoute
+  LootShopRoute: typeof LootShopRoute
+  MoneyLabRoute: typeof MoneyLabRoute
+  MonstersRoute: typeof MonstersRoute
+  QuestsRoute: typeof QuestsRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  RoastRoute: typeof RoastRoute
+  VaultRoute: typeof VaultRoute
+  ApiPublicPaypalHealthRoute: typeof ApiPublicPaypalHealthRoute
+  ApiPublicPaypalWebhookRoute: typeof ApiPublicPaypalWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +195,99 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/expenses': {
+      id: '/expenses'
+      path: '/expenses'
+      fullPath: '/expenses'
+      preLoaderRoute: typeof ExpensesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/goals': {
+      id: '/goals'
+      path: '/goals'
+      fullPath: '/goals'
+      preLoaderRoute: typeof GoalsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/loot-shop': {
+      id: '/loot-shop'
+      path: '/loot-shop'
+      fullPath: '/loot-shop'
+      preLoaderRoute: typeof LootShopRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/money-lab': {
+      id: '/money-lab'
+      path: '/money-lab'
+      fullPath: '/money-lab'
+      preLoaderRoute: typeof MoneyLabRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/monsters': {
+      id: '/monsters'
+      path: '/monsters'
+      fullPath: '/monsters'
+      preLoaderRoute: typeof MonstersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quests': {
+      id: '/quests'
+      path: '/quests'
+      fullPath: '/quests'
+      preLoaderRoute: typeof QuestsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/roast': {
+      id: '/roast'
+      path: '/roast'
+      fullPath: '/roast'
+      preLoaderRoute: typeof RoastRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vault': {
+      id: '/vault'
+      path: '/vault'
+      fullPath: '/vault'
+      preLoaderRoute: typeof VaultRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/paypal-health': {
+      id: '/api/public/paypal-health'
+      path: '/api/public/paypal-health'
+      fullPath: '/api/public/paypal-health'
+      preLoaderRoute: typeof ApiPublicPaypalHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/paypal-webhook': {
+      id: '/api/public/paypal-webhook'
+      path: '/api/public/paypal-webhook'
+      fullPath: '/api/public/paypal-webhook'
+      preLoaderRoute: typeof ApiPublicPaypalWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ExpensesRoute: ExpensesRoute,
+  GoalsRoute: GoalsRoute,
+  LootShopRoute: LootShopRoute,
+  MoneyLabRoute: MoneyLabRoute,
+  MonstersRoute: MonstersRoute,
+  QuestsRoute: QuestsRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  RoastRoute: RoastRoute,
+  VaultRoute: VaultRoute,
+  ApiPublicPaypalHealthRoute: ApiPublicPaypalHealthRoute,
+  ApiPublicPaypalWebhookRoute: ApiPublicPaypalWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
