@@ -1,5 +1,14 @@
 # Spendemon roadmap
 
+## Hackathon readiness checklist (in progress)
+- [ ] Signed-in PayPal self-test, return-state recovery, capture/webhook/credit tests
+- [ ] Idempotent refund reversal and Vault timeline
+- [ ] Savings Autopilot with validated proposals, deterministic fallback, shared AI generation
+- [ ] Spendemon Savings Vault story and idempotent sandbox withdrawals
+- [ ] USD formatting throughout without changing stored integers
+- [ ] Judge entry, spotlight tour, clearly simulated checkout
+- [ ] Secret hygiene, route/Guardian tests, documentation and verification at 360px
+
 ## Phase 1 — "Pay. Save. Evolve." upgrade (done)
 - [x] Answer: where to see the preview
 - [x] Database: savings goals, PayPal ledger (extend shop_orders), inventory, milestone rewards, webhook events, atomic credit function
