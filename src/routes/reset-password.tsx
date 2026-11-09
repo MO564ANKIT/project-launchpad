@@ -18,7 +18,6 @@ export const Route = createFileRoute("/reset-password")({
     ],
   }),
   errorComponent: RouteError,
-  errorComponent: RouteError,
   component: ResetPasswordPage,
 });
 
