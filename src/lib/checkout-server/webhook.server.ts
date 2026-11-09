@@ -70,12 +70,16 @@ export function interpretWebhookEvent(event: WebhookEvent): WebhookAction {
       if (typeof orderId !== "string") return { kind: "ignore" };
       return { kind: "fail", orderId, reason: `PayPal reported ${event.event_type}` };
     case "PAYMENT.CAPTURE.REFUNDED":
-    case "PAYMENT.CAPTURE.REVERSED":
-      // The refunded resource links back to the capture via its "up" link; we match on capture id when present.
-      { const captureId = resource.supplementary_data?.related_ids?.capture_id ??
-          resource.links?.find((link) => link.rel === "up")?.href?.match(/\/captures\/([A-Z0-9]+)(?:\?|$)/)?.[1] ??
-          (event.event_type === "PAYMENT.CAPTURE.REVERSED" ? resource.id : undefined);
-        return captureId ? { kind: "refund", captureId } : { kind: "ignore" }; }
+    case "PAYMENT.CAPTURE.REVERSED": // The refunded resource links back to the capture via its "up" link; we match on capture id when present.
+    {
+      const captureId =
+        resource.supplementary_data?.related_ids?.capture_id ??
+        resource.links
+          ?.find((link) => link.rel === "up")
+          ?.href?.match(/\/captures\/([A-Z0-9]+)(?:\?|$)/)?.[1] ??
+        (event.event_type === "PAYMENT.CAPTURE.REVERSED" ? resource.id : undefined);
+      return captureId ? { kind: "refund", captureId } : { kind: "ignore" };
+    }
     default:
       return { kind: "ignore" };
   }

@@ -238,16 +238,20 @@ export function GoalCard({ goal, rewards, contributions, tourTarget }: GoalCardP
             onClick={contribute}
             data-tour={tourTarget ? "contribute" : undefined}
           >
-            {goal.is_demo ? (busy ? "Opening simulated checkout…" : "Simulated checkout") : checkoutPaused
-              ? "Sandbox setup needed"
-              : busy
-                ? "Opening PayPal Sandbox..."
-                : `Contribute ${amount ? formatUsdCents(amount) : ""} with PayPal`}
+            {goal.is_demo
+              ? busy
+                ? "Opening simulated checkout…"
+                : "Simulated checkout"
+              : checkoutPaused
+                ? "Sandbox setup needed"
+                : busy
+                  ? "Opening PayPal Sandbox..."
+                  : `Contribute ${amount ? formatUsdCents(amount) : ""} with PayPal`}
           </Button>
           <TestModeNote />
           <p className="text-xs text-ink-400">
-            Spendemon Savings Vault holds sandbox test funds in its PayPal merchant account.
-            Demo contributions are simulated; no real money is stored.
+            Spendemon Savings Vault holds sandbox test funds in its PayPal merchant account. Demo
+            contributions are simulated; no real money is stored.
           </p>
         </div>
       )}

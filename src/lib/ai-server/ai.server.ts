@@ -37,7 +37,10 @@ export async function generateAiText(req: AiTextRequest): Promise<AiTextResult> 
             })),
             { role: "user", parts: [{ text: req.user }] },
           ],
-          generationConfig: { temperature: req.temperature ?? 0.6, maxOutputTokens: req.maxOutputTokens ?? 2048 },
+          generationConfig: {
+            temperature: req.temperature ?? 0.6,
+            maxOutputTokens: req.maxOutputTokens ?? 2048,
+          },
         }),
       });
       const data = await response.json().catch(() => null);

@@ -92,7 +92,10 @@ export function VaultPage() {
       <div className="grid gap-4 sm:grid-cols-3">
         <Tile
           label="Verified payments"
-          value={String(rows.filter((tx) => tx.status === "completed" && !tx.is_demo && tx.kind !== "payout").length)}
+          value={String(
+            rows.filter((tx) => tx.status === "completed" && !tx.is_demo && tx.kind !== "payout")
+              .length,
+          )}
         />
         <Tile label="Verified total" value={formatUsdCents(verifiedTotal)} />
         <Tile label="Saved toward goals" value={formatUsdCents(savedTotal)} />
@@ -180,7 +183,9 @@ export function VaultPage() {
                   </div>
                   <div className="flex items-center gap-3">
                     <StatusPill status={tx.status} />
-                    {tx.is_demo && <span className="text-xs font-bold text-amber-300">Simulated</span>}
+                    {tx.is_demo && (
+                      <span className="text-xs font-bold text-amber-300">Simulated</span>
+                    )}
                     <span className="font-display text-lg font-bold text-ink-50">
                       {formatUsdCents(tx.amount_cents)}
                     </span>

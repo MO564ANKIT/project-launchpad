@@ -62,7 +62,11 @@ export const paypalCheckout = createServerFn({ method: "POST" })
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const checkout = await import("./checkout-server/paypal.server");
       const judge = context.claims.app_metadata?.judge_mode === true;
-      if (data.simulated || judge || (typeof data.orderId === "string" && data.orderId.startsWith("DEMO"))) {
+      if (
+        data.simulated ||
+        judge ||
+        (typeof data.orderId === "string" && data.orderId.startsWith("DEMO"))
+      ) {
         const { simulateCheckout } = await import("./checkout-server/simulate.server");
         return await simulateCheckout(supabaseAdmin, context.userId, data);
       }
@@ -117,5 +121,9 @@ export const paypalSetup = createServerFn({ method: "GET" })
       await import("./checkout-server/setupStatus");
     const status = paypalSetupStatus(process.env);
     logMissingPaypalSecrets("setup check", status);
-    return { checkoutReady: status.checkoutReady, webhooksReady: status.webhooksReady, owner: context.userId === process.env["SPENDEMON_OWNER_USER_ID"] };
+    return {
+      checkoutReady: status.checkoutReady,
+      webhooksReady: status.webhooksReady,
+      owner: context.userId === process.env["SPENDEMON_OWNER_USER_ID"],
+    };
   });

@@ -37,7 +37,8 @@ export function PurchaseGuardian({
 }: PurchaseGuardianProps) {
   const setup = usePaypalSetup();
   const { session } = useAuth();
-  const simulated = session?.user.app_metadata.judge_mode === true || setup.data?.checkoutReady === false;
+  const simulated =
+    session?.user.app_metadata.judge_mode === true || setup.data?.checkoutReady === false;
   const { today, saveForLater } = useGame();
   const [result, setResult] = useState<Loaded | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -209,7 +210,11 @@ export function PurchaseGuardian({
 
         <div className="grid gap-2 sm:grid-cols-3">
           <Button variant="primary" onClick={pay} disabled={paying}>
-            {paying ? "Opening checkout..." : simulated ? "Simulated checkout" : "Continue to PayPal"}
+            {paying
+              ? "Opening checkout..."
+              : simulated
+                ? "Simulated checkout"
+                : "Continue to PayPal"}
           </Button>
           <Button variant="volt" onClick={later} disabled={paying}>
             <Bookmark className="h-4 w-4" /> Save for later

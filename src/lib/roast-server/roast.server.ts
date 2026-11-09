@@ -141,10 +141,21 @@ export async function runRoast(
   const result = await generateAiText({
     system: request.systemInstruction.parts[0].text,
     user: request.contents[request.contents.length - 1].parts[0].text,
-    history: history.slice(-MAX_HISTORY).map((item) => ({ role: item.role === "user" ? "user" : "assistant", text: item.text.slice(0, MAX_HISTORY_TEXT) })),
+    history: history
+      .slice(-MAX_HISTORY)
+      .map((item) => ({
+        role: item.role === "user" ? "user" : "assistant",
+        text: item.text.slice(0, MAX_HISTORY_TEXT),
+      })),
     temperature: 1.0,
     maxOutputTokens: 4096,
   });
   if (result.ok) return { ok: true, reply: result.text };
-  return { ok: false, error: result.reason === "credits" ? "The AI roaster is out of credits right now." : "The AI roaster is taking a break. Try again in a moment." };
+  return {
+    ok: false,
+    error:
+      result.reason === "credits"
+        ? "The AI roaster is out of credits right now."
+        : "The AI roaster is taking a break. Try again in a moment.",
+  };
 }

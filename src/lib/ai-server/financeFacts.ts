@@ -72,7 +72,11 @@ export function computeGuardianFacts(
     state.monthlyBudgetPaise === null ? null : state.monthlyBudgetPaise - spend.total;
 
   const share = (remaining: number | null) =>
-    remaining === null ? null : remaining <= 0 ? null : round1((priceBudgetCents / remaining) * 100);
+    remaining === null
+      ? null
+      : remaining <= 0
+        ? null
+        : round1((priceBudgetCents / remaining) * 100);
 
   const remainingValues = [categoryRemaining, monthlyRemaining].filter(
     (value): value is number => value !== null,

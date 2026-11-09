@@ -72,7 +72,8 @@ export function paypalConfigured(): boolean {
 // Gateway credentials stay server-side; PayPal access tokens are managed by the connector.
 export async function getAccessToken(): Promise<string> {
   const key = process.env["LOVABLE_API_KEY"];
-  if (!key || !process.env["PAYPAL_API_KEY"]) throw new Error("PayPal connection is not configured");
+  if (!key || !process.env["PAYPAL_API_KEY"])
+    throw new Error("PayPal connection is not configured");
   return key;
 }
 
@@ -82,8 +83,12 @@ export async function paypalFetch(path: string, init: RequestInit = {}): Promise
   headers.set("Authorization", `Bearer ${token}`);
   headers.set("X-Connection-Api-Key", process.env["PAYPAL_API_KEY"] ?? "");
   headers.set("Content-Type", "application/json");
-  const response = await fetch(`https://connector-gateway.lovable.dev/paypal${path}`, { ...init, headers });
-  if (!response.ok) console.error("PayPal request failed", response.status, await response.clone().text());
+  const response = await fetch(`https://connector-gateway.lovable.dev/paypal${path}`, {
+    ...init,
+    headers,
+  });
+  if (!response.ok)
+    console.error("PayPal request failed", response.status, await response.clone().text());
   return response;
 }
 
