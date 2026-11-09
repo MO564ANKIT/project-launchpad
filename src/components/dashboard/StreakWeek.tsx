@@ -27,11 +27,11 @@ export function StreakWeek({ events, todayKey, streak, onLogToday }: StreakWeekP
           </Button>
         )}
       </div>
-      <ol className="grid grid-cols-7 gap-2 sm:gap-3">
+      <ol className="grid grid-cols-7 gap-1 sm:gap-3">
         {days.map((day) => (
           <li key={day.key} className="flex flex-col items-center gap-2">
             <span
-              className={`flex h-9 w-9 sm:h-12 sm:w-12 items-center justify-center rounded-full border-2 transition duration-300 md:h-14 md:w-14 ${
+              className={`flex h-8 w-8 sm:h-12 sm:w-12 items-center justify-center rounded-full border-2 transition duration-300 md:h-14 md:w-14 ${
                 day.active
                   ? "border-amber-400 bg-amber-500/20 text-amber-300 shadow-glow-amber"
                   : "border-white/10 bg-night-950/60 text-ink-500"
