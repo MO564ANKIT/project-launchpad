@@ -14,13 +14,279 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      goal_rewards: {
+        Row: {
+          goal_id: string
+          granted_at: string
+          id: string
+          milestone: number
+          order_id: string | null
+          user_id: string
+        }
+        Insert: {
+          goal_id: string
+          granted_at?: string
+          id?: string
+          milestone: number
+          order_id?: string | null
+          user_id: string
+        }
+        Update: {
+          goal_id?: string
+          granted_at?: string
+          id?: string
+          milestone?: number
+          order_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "goal_rewards_goal_id_fkey"
+            columns: ["goal_id"]
+            isOneToOne: false
+            referencedRelation: "savings_goals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "goal_rewards_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "shop_orders"
+            referencedColumns: ["paypal_order_id"]
+          },
+        ]
+      }
+      legacy_user_map: {
+        Row: {
+          auth_user_id: string | null
+          email: string
+          imported_at: string
+          original_user_id: string
+        }
+        Insert: {
+          auth_user_id?: string | null
+          email: string
+          imported_at?: string
+          original_user_id: string
+        }
+        Update: {
+          auth_user_id?: string | null
+          email?: string
+          imported_at?: string
+          original_user_id?: string
+        }
+        Relationships: []
+      }
+      paypal_webhook_events: {
+        Row: {
+          event_id: string
+          event_type: string
+          outcome: string | null
+          processed_at: string | null
+          received_at: string
+          resource_id: string | null
+        }
+        Insert: {
+          event_id: string
+          event_type: string
+          outcome?: string | null
+          processed_at?: string | null
+          received_at?: string
+          resource_id?: string | null
+        }
+        Update: {
+          event_id?: string
+          event_type?: string
+          outcome?: string | null
+          processed_at?: string | null
+          received_at?: string
+          resource_id?: string | null
+        }
+        Relationships: []
+      }
+      player_saves: {
+        Row: {
+          state: Json
+          updated_at: string
+          user_id: string
+          version: number
+        }
+        Insert: {
+          state: Json
+          updated_at?: string
+          user_id?: string
+          version?: number
+        }
+        Update: {
+          state?: Json
+          updated_at?: string
+          user_id?: string
+          version?: number
+        }
+        Relationships: []
+      }
+      roast_requests: {
+        Row: {
+          created_at: string
+          id: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          user_id?: string
+        }
+        Relationships: []
+      }
+      savings_goals: {
+        Row: {
+          completed_at: string | null
+          contributed_cents: number
+          created_at: string
+          deadline: string | null
+          id: string
+          is_demo: boolean
+          name: string
+          target_cents: number
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          contributed_cents?: number
+          created_at?: string
+          deadline?: string | null
+          id?: string
+          is_demo?: boolean
+          name: string
+          target_cents: number
+          user_id?: string
+        }
+        Update: {
+          completed_at?: string | null
+          contributed_cents?: number
+          created_at?: string
+          deadline?: string | null
+          id?: string
+          is_demo?: boolean
+          name?: string
+          target_cents?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      shop_orders: {
+        Row: {
+          amount_cents: number
+          captured_at: string | null
+          created_at: string
+          currency: string
+          failure_reason: string | null
+          goal_id: string | null
+          id: string
+          is_demo: boolean
+          item_ids: string[]
+          kind: string
+          paypal_capture_id: string | null
+          paypal_order_id: string
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          amount_cents: number
+          captured_at?: string | null
+          created_at?: string
+          currency?: string
+          failure_reason?: string | null
+          goal_id?: string | null
+          id?: string
+          is_demo?: boolean
+          item_ids: string[]
+          kind?: string
+          paypal_capture_id?: string | null
+          paypal_order_id: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount_cents?: number
+          captured_at?: string | null
+          created_at?: string
+          currency?: string
+          failure_reason?: string | null
+          goal_id?: string | null
+          id?: string
+          is_demo?: boolean
+          item_ids?: string[]
+          kind?: string
+          paypal_capture_id?: string | null
+          paypal_order_id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_orders_goal_id_fkey"
+            columns: ["goal_id"]
+            isOneToOne: false
+            referencedRelation: "savings_goals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_inventory: {
+        Row: {
+          acquired_at: string
+          id: string
+          item_id: string
+          order_id: string | null
+          source: string
+          user_id: string
+        }
+        Insert: {
+          acquired_at?: string
+          id?: string
+          item_id: string
+          order_id?: string | null
+          source?: string
+          user_id: string
+        }
+        Update: {
+          acquired_at?: string
+          id?: string
+          item_id?: string
+          order_id?: string | null
+          source?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_inventory_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "shop_orders"
+            referencedColumns: ["paypal_order_id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      credit_paypal_order: {
+        Args: { _capture_id: string; _order_id: string }
+        Returns: Json
+      }
+      reset_demo_journey: { Args: { _user_id: string }; Returns: undefined }
+      start_demo_journey: { Args: { _user_id: string }; Returns: Json }
     }
     Enums: {
       [_ in never]: never
