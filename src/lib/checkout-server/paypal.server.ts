@@ -87,7 +87,10 @@ export async function getAccessToken(): Promise<string> {
   return data.access_token;
 }
 
-async function fetchPaypalOrder(accessToken: string, orderId: string): Promise<PaypalOrderBody | null> {
+async function fetchPaypalOrder(
+  accessToken: string,
+  orderId: string,
+): Promise<PaypalOrderBody | null> {
   const response = await fetch(`${PAYPAL_API}/v2/checkout/orders/${orderId}`, {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
@@ -117,7 +120,9 @@ interface PaypalOrderRequest {
   origin: string;
 }
 
-async function startPaypalOrder(req: PaypalOrderRequest): Promise<{ id: string; approveUrl: string } | null> {
+async function startPaypalOrder(
+  req: PaypalOrderRequest,
+): Promise<{ id: string; approveUrl: string } | null> {
   const accessToken = await getAccessToken();
   const response = await fetch(`${PAYPAL_API}/v2/checkout/orders`, {
     method: "POST",
@@ -147,13 +152,20 @@ async function startPaypalOrder(req: PaypalOrderRequest): Promise<{ id: string; 
   });
   const order = await response.json().catch(() => null);
   const approveUrl = Array.isArray(order?.links)
-    ? order.links.find((link: { rel?: string }) => link.rel === "payer-action" || link.rel === "approve")?.href
+    ? order.links.find(
+        (link: { rel?: string }) => link.rel === "payer-action" || link.rel === "approve",
+      )?.href
     : undefined;
   if (!response.ok || typeof order?.id !== "string" || typeof approveUrl !== "string") return null;
   return { id: order.id, approveUrl };
 }
 
-export async function createOrder(db: Db, userId: string, itemIds: unknown, origin: string | null): Promise<CheckoutResult> {
+export async function createOrder(
+  db: Db,
+  userId: string,
+  itemIds: unknown,
+  origin: string | null,
+): Promise<CheckoutResult> {
   if (
     !Array.isArray(itemIds) ||
     itemIds.length === 0 ||
@@ -210,7 +222,8 @@ export async function createGoalContribution(
   amountCents: unknown,
   origin: string | null,
 ): Promise<CheckoutResult> {
-  if (typeof goalId !== "string" || !UUID_PATTERN.test(goalId)) return fail("Pick a savings goal first.");
+  if (typeof goalId !== "string" || !UUID_PATTERN.test(goalId))
+    return fail("Pick a savings goal first.");
   if (
     typeof amountCents !== "number" ||
     !Number.isInteger(amountCents) ||
@@ -232,7 +245,9 @@ export async function createGoalContribution(
   if (goal.completed_at) return fail("This goal is already complete.");
   const remaining = goal.target_cents - goal.contributed_cents;
   if (amountCents > remaining) {
-    return fail(`Only ${centsToValue(remaining)} USD is left to reach this goal. Pick a smaller amount.`);
+    return fail(
+      `Only ${centsToValue(remaining)} USD is left to reach this goal. Pick a smaller amount.`,
+    );
   }
 
   const limited = await checkRateLimit(db, userId);
@@ -264,11 +279,20 @@ export async function createGoalContribution(
 }
 
 // Atomically credits a verified order once. Safe to call repeatedly.
-export async function creditVerifiedOrder(db: Db, orderId: string, captureId: string | null): Promise<number[]> {
-  const { data, error } = await db.rpc("credit_paypal_order", { _order_id: orderId, _capture_id: captureId });
+export async function creditVerifiedOrder(
+  db: Db,
+  orderId: string,
+  captureId: string | null,
+): Promise<number[]> {
+  const { data, error } = await db.rpc("credit_paypal_order", {
+    _order_id: orderId,
+    _capture_id: captureId,
+  });
   if (error) throw error;
   const milestones = (data as { milestones?: unknown } | null)?.milestones;
-  return Array.isArray(milestones) ? milestones.filter((m): m is number => typeof m === "number") : [];
+  return Array.isArray(milestones)
+    ? milestones.filter((m): m is number => typeof m === "number")
+    : [];
 }
 
 function completedBody(order: OrderRow, milestones: number[] = []): CheckoutBody {
@@ -287,12 +311,19 @@ function completedBody(order: OrderRow, milestones: number[] = []): CheckoutBody
 async function milestonesForOrder(db: Db, orderId: string): Promise<number[]> {
   const { data, error } = await db.from("goal_rewards").select("milestone").eq("order_id", orderId);
   if (error) throw error;
-  return (data ?? []).map((row: { milestone: number }) => row.milestone).sort((a: number, b: number) => a - b);
+  return (data ?? [])
+    .map((row: { milestone: number }) => row.milestone)
+    .sort((a: number, b: number) => a - b);
 }
 
-const PENDING_MESSAGE = "PayPal is still confirming this payment. Nothing is unlocked until it clears.";
+const PENDING_MESSAGE =
+  "PayPal is still confirming this payment. Nothing is unlocked until it clears.";
 
-export async function captureOrder(db: Db, userId: string, orderId: unknown): Promise<CheckoutResult> {
+export async function captureOrder(
+  db: Db,
+  userId: string,
+  orderId: unknown,
+): Promise<CheckoutResult> {
   if (typeof orderId !== "string" || !ORDER_ID_PATTERN.test(orderId)) {
     return fail("That payment reference is not valid.");
   }
@@ -319,11 +350,18 @@ export async function captureOrder(db: Db, userId: string, orderId: unknown): Pr
     if (!existing) return fail("We could not find this order.");
     const row = existing as OrderRow;
     if (row.status === "completed") {
-      const milestones = row.kind === "goal_contribution" ? await milestonesForOrder(db, orderId) : [];
+      const milestones =
+        row.kind === "goal_contribution" ? await milestonesForOrder(db, orderId) : [];
       return ok(completedBody(row, milestones));
     }
-    if (row.status === "capturing") return ok({ status: "pending", orderId, kind: row.kind, message: PENDING_MESSAGE });
-    return ok({ status: row.status, orderId, kind: row.kind, message: "This order can no longer be paid." });
+    if (row.status === "capturing")
+      return ok({ status: "pending", orderId, kind: row.kind, message: PENDING_MESSAGE });
+    return ok({
+      status: row.status,
+      orderId,
+      kind: row.kind,
+      message: "This order can no longer be paid.",
+    });
   }
 
   const order = claimed as OrderRow;
@@ -361,26 +399,40 @@ export async function captureOrder(db: Db, userId: string, orderId: unknown): Pr
 
   const { error: updateError } = await db
     .from("shop_orders")
-    .update({ status: nextStatus, paypal_capture_id: captureId, failure_reason: reason, updated_at: new Date().toISOString() })
+    .update({
+      status: nextStatus,
+      paypal_capture_id: captureId,
+      failure_reason: reason,
+      updated_at: new Date().toISOString(),
+    })
     .eq("paypal_order_id", orderId)
     .eq("user_id", userId)
     .eq("status", "capturing");
   if (updateError) throw updateError;
 
-  if (capturePending) return ok({ status: "pending", orderId, kind: order.kind, message: PENDING_MESSAGE });
+  if (capturePending)
+    return ok({ status: "pending", orderId, kind: order.kind, message: PENDING_MESSAGE });
   const message = stillPayable
     ? "Payment was not completed. You can try again."
     : "PayPal did not confirm this payment, so nothing was unlocked.";
   return ok({ status: "failed", orderId, kind: order.kind, message });
 }
 
-export async function cancelOrder(db: Db, userId: string, orderId: unknown): Promise<CheckoutResult> {
+export async function cancelOrder(
+  db: Db,
+  userId: string,
+  orderId: unknown,
+): Promise<CheckoutResult> {
   if (typeof orderId !== "string" || !ORDER_ID_PATTERN.test(orderId)) {
     return fail("That payment reference is not valid.");
   }
   const { data, error } = await db
     .from("shop_orders")
-    .update({ status: "cancelled", failure_reason: "Cancelled at PayPal", updated_at: new Date().toISOString() })
+    .update({
+      status: "cancelled",
+      failure_reason: "Cancelled at PayPal",
+      updated_at: new Date().toISOString(),
+    })
     .eq("paypal_order_id", orderId)
     .eq("user_id", userId)
     .eq("status", "created")

@@ -1,9 +1,9 @@
-import { Pencil, Trash2 } from 'lucide-react';
-import { Button } from '@/components/kit/Button';
-import { CategoryTag } from '@/components/kit/CategoryTag';
-import { formatDayLabel, shiftDateKey } from '@/lib/dates';
-import { formatMoney } from '@/lib/money';
-import type { Expense } from '@/types';
+import { Pencil, Trash2 } from "lucide-react";
+import { Button } from "@/components/kit/Button";
+import { CategoryTag } from "@/components/kit/CategoryTag";
+import { formatDayLabel, shiftDateKey } from "@/lib/dates";
+import { formatMoney } from "@/lib/money";
+import type { Expense } from "@/types";
 
 interface ExpenseListProps {
   expenses: Expense[];
@@ -13,8 +13,8 @@ interface ExpenseListProps {
 }
 
 export function dayHeading(date: string, today: string): string {
-  if (date === today) return 'Today';
-  if (date === shiftDateKey(today, -1)) return 'Yesterday';
+  if (date === today) return "Today";
+  if (date === shiftDateKey(today, -1)) return "Yesterday";
   return formatDayLabel(date);
 }
 
@@ -28,7 +28,9 @@ export function ExpenseList({ expenses, today, onEdit, onDelete }: ExpenseListPr
     <div className="space-y-6">
       {Object.entries(groups).map(([date, items]) => (
         <section key={date}>
-          <h3 className="mb-2 px-1 text-xs font-bold uppercase tracking-wider text-ink-400">{dayHeading(date, today)}</h3>
+          <h3 className="mb-2 px-1 text-xs font-bold uppercase tracking-wider text-ink-400">
+            {dayHeading(date, today)}
+          </h3>
           <ul className="space-y-2">
             {items.map((expense) => (
               <li
@@ -49,12 +51,24 @@ export function ExpenseList({ expenses, today, onEdit, onDelete }: ExpenseListPr
                   </div>
                 </div>
                 <div className="flex items-center justify-between gap-3 sm:justify-end">
-                  <p className="font-display text-lg font-bold text-ink-50">{formatMoney(expense.amountPaise)}</p>
+                  <p className="font-display text-lg font-bold text-ink-50">
+                    {formatMoney(expense.amountPaise)}
+                  </p>
                   <div className="flex gap-1">
-                    <Button variant="subtle" size="sm" onClick={() => onEdit(expense)} aria-label={`Edit ${expense.description}`}>
+                    <Button
+                      variant="subtle"
+                      size="sm"
+                      onClick={() => onEdit(expense)}
+                      aria-label={`Edit ${expense.description}`}
+                    >
                       <Pencil className="h-4 w-4" />
                     </Button>
-                    <Button variant="subtle" size="sm" onClick={() => onDelete(expense)} aria-label={`Delete ${expense.description}`}>
+                    <Button
+                      variant="subtle"
+                      size="sm"
+                      onClick={() => onDelete(expense)}
+                      aria-label={`Delete ${expense.description}`}
+                    >
                       <Trash2 className="h-4 w-4 text-rose-300" />
                     </Button>
                   </div>

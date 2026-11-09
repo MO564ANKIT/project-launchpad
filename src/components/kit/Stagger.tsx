@@ -1,12 +1,12 @@
-import { motion, type Variants } from 'framer-motion';
-import type { ReactNode } from 'react';
+import { motion, type Variants } from "framer-motion";
+import type { ReactNode } from "react";
 
 const variants: Variants = {
   hidden: { opacity: 0, y: 14 },
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.07, duration: 0.4, ease: 'easeOut' as const },
+    transition: { delay: i * 0.07, duration: 0.4, ease: "easeOut" as const },
   }),
 };
 

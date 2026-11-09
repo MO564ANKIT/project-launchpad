@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from "react";
 
 const EASE_OUT = (t: number) => 1 - Math.pow(1 - t, 3);
 

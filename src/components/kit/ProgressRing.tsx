@@ -1,13 +1,13 @@
-import { motion } from 'framer-motion';
-import type { Tone } from '@/components/kit/ProgressBar';
-import { cn } from '@/lib/cn';
+import { motion } from "framer-motion";
+import type { Tone } from "@/components/kit/ProgressBar";
+import { cn } from "@/lib/cn";
 
 const STROKE: Record<Tone, string> = {
-  neon: 'text-neon-400',
-  volt: 'text-volt-400',
-  amber: 'text-amber-400',
-  rose: 'text-rose-400',
-  aqua: 'text-aqua-400',
+  neon: "text-neon-400",
+  volt: "text-volt-400",
+  amber: "text-amber-400",
+  rose: "text-rose-400",
+  aqua: "text-aqua-400",
 };
 
 interface ProgressRingProps {
@@ -17,7 +17,7 @@ interface ProgressRingProps {
   label: string;
 }
 
-export function ProgressRing({ value, tone = 'neon', size = 88, label }: ProgressRingProps) {
+export function ProgressRing({ value, tone = "neon", size = 88, label }: ProgressRingProps) {
   const clamped = Math.max(0, Math.min(100, value));
   const stroke = 6;
   const radius = (size - stroke) / 2;
@@ -30,11 +30,22 @@ export function ProgressRing({ value, tone = 'neon', size = 88, label }: Progres
       aria-valuemax={100}
       aria-valuenow={Math.round(clamped)}
       aria-label={label}
-      className={cn('relative shrink-0', STROKE[tone])}
+      className={cn("relative shrink-0", STROKE[tone])}
       style={{ width: size, height: size }}
     >
-      <svg viewBox={`0 0 ${size} ${size}`} className="-rotate-90 drop-shadow-[0_0_8px_currentColor]" aria-hidden="true">
-        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth={stroke} />
+      <svg
+        viewBox={`0 0 ${size} ${size}`}
+        className="-rotate-90 drop-shadow-[0_0_8px_currentColor]"
+        aria-hidden="true"
+      >
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke="rgba(255,255,255,0.08)"
+          strokeWidth={stroke}
+        />
         <motion.circle
           cx={size / 2}
           cy={size / 2}

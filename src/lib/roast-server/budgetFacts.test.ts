@@ -14,7 +14,11 @@ function stateWith(overrides: Partial<SavedBudgetState> = {}): SavedBudgetState 
       { amountPaise: 50_000, category: "coffee", date: "2025-06-10" },
       { amountPaise: 999_999, category: "bills", date: "2025-05-30" },
     ],
-    events: [{ at: "2025-06-13T09:00:00.000Z" }, { at: "2025-06-14T09:00:00.000Z" }, { at: "2025-06-15T08:00:00.000Z" }],
+    events: [
+      { at: "2025-06-13T09:00:00.000Z" },
+      { at: "2025-06-14T09:00:00.000Z" },
+      { at: "2025-06-15T08:00:00.000Z" },
+    ],
     ...overrides,
   };
 }
@@ -55,7 +59,11 @@ describe("buildBudgetFacts", () => {
   });
 
   it("explains when no budget is set", () => {
-    const facts = buildBudgetFacts(stateWith({ monthlyBudgetPaise: null, categoryBudgetsPaise: {} }), "hoodie for 500", TODAY);
+    const facts = buildBudgetFacts(
+      stateWith({ monthlyBudgetPaise: null, categoryBudgetsPaise: {} }),
+      "hoodie for 500",
+      TODAY,
+    );
     expect(facts[0]).toBe("No monthly budget is set.");
     expect(facts.join("\n")).toContain("cannot be checked because no budget is set");
   });
@@ -103,7 +111,20 @@ describe("parity with the client finance logic", () => {
   for (const { message, amountPaise, category } of cases) {
     it(`agrees with the app's simulator for "${message}"`, () => {
       const state = stateWith();
-      const summary = summarizeMonth({ ...state, expenses: state.expenses.map((e) => ({ ...e, id: "x", description: "", isSample: false, createdAt: e.date, category: e.category as Category })) }, "2025-06");
+      const summary = summarizeMonth(
+        {
+          ...state,
+          expenses: state.expenses.map((e) => ({
+            ...e,
+            id: "x",
+            description: "",
+            isSample: false,
+            createdAt: e.date,
+            category: e.category as Category,
+          })),
+        },
+        "2025-06",
+      );
       const expected = simulatePurchase(summary, amountPaise, category).verdict;
       expect(buildBudgetFacts(state, message, TODAY).join("\n")).toContain(verdictPhrase[expected]);
     });

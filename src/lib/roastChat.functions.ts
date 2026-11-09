@@ -13,7 +13,8 @@ export type RoastResponse = { ok: true; reply: string } | { ok: false; error: st
 export const roastChat = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: RoastInput) => {
-    if (!input || typeof input !== "object") throw new Error("The roast request was not in the expected shape.");
+    if (!input || typeof input !== "object")
+      throw new Error("The roast request was not in the expected shape.");
     return input;
   })
   .handler(async ({ data, context }): Promise<RoastResponse> => {

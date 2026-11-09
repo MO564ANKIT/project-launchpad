@@ -1,11 +1,11 @@
-import { useState, type ReactNode } from 'react';
-import { Info } from 'lucide-react';
-import { AchievementGrid } from '@/components/quests/AchievementGrid';
-import { QuestRow } from '@/components/quests/QuestRow';
-import { Celebration } from '@/components/kit/Celebration';
-import { getSpecies } from '@/lib/monsters';
-import { QUESTS, countQuestProgress, questRecordKey, type QuestDefinition } from '@/lib/quests';
-import { useGame } from '@/state/gameContext';
+import { useState, type ReactNode } from "react";
+import { Info } from "lucide-react";
+import { AchievementGrid } from "@/components/quests/AchievementGrid";
+import { QuestRow } from "@/components/quests/QuestRow";
+import { Celebration } from "@/components/kit/Celebration";
+import { getSpecies } from "@/lib/monsters";
+import { QUESTS, countQuestProgress, questRecordKey, type QuestDefinition } from "@/lib/quests";
+import { useGame } from "@/state/gameContext";
 
 export function QuestsPage() {
   const { state, today, startQuest, claimQuest } = useGame();
@@ -17,10 +17,10 @@ export function QuestsPage() {
     record: state.quests[questRecordKey(quest.id, quest.period, today)] ?? null,
   });
 
-  const daily = QUESTS.filter((quest) => quest.period === 'daily').map(rowsFor);
-  const weekly = QUESTS.filter((quest) => quest.period === 'weekly').map(rowsFor);
-  const completedToday = daily.filter((row) => row.record?.status === 'completed').length;
-  const completedWeek = weekly.filter((row) => row.record?.status === 'completed').length;
+  const daily = QUESTS.filter((quest) => quest.period === "daily").map(rowsFor);
+  const weekly = QUESTS.filter((quest) => quest.period === "weekly").map(rowsFor);
+  const completedToday = daily.filter((row) => row.record?.status === "completed").length;
+  const completedWeek = weekly.filter((row) => row.record?.status === "completed").length;
 
   const handleClaim = (quest: QuestDefinition) => {
     claimQuest(quest.id);
@@ -34,15 +34,24 @@ export function QuestsPage() {
     <div className="space-y-8">
       <header>
         <p className="text-sm font-medium text-neon-400">Quest board</p>
-        <h1 className="mt-1 text-3xl font-bold text-ink-50 sm:text-4xl">Pick a quest. Finish it. Get XP.</h1>
+        <h1 className="mt-1 text-3xl font-bold text-ink-50 sm:text-4xl">
+          Pick a quest. Finish it. Get XP.
+        </h1>
         <p className="mt-2 max-w-2xl text-sm text-ink-300">
-          Quests reward things you do: tracking, pausing, and skipping. Spending amounts never add or remove XP.
+          Quests reward things you do: tracking, pausing, and skipping. Spending amounts never add
+          or remove XP.
         </p>
       </header>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <SummaryTile label="Daily quests done today" value={`${completedToday} / ${daily.length}`} />
-        <SummaryTile label="Weekly quests done this week" value={`${completedWeek} / ${weekly.length}`} />
+        <SummaryTile
+          label="Daily quests done today"
+          value={`${completedToday} / ${daily.length}`}
+        />
+        <SummaryTile
+          label="Weekly quests done this week"
+          value={`${completedWeek} / ${weekly.length}`}
+        />
       </div>
 
       <div className="grid gap-6 xl:grid-cols-5">
@@ -77,7 +86,9 @@ export function QuestsPage() {
             <ul className="mt-4 space-y-3 text-sm text-ink-300">
               <li>Each logged expense gives 10 XP to the monster that matches its category.</li>
               <li>Claiming a quest gives the XP shown on that quest to its reward monster.</li>
-              <li>Quests track actions and logging. They never reward or punish how much you spend.</li>
+              <li>
+                Quests track actions and logging. They never reward or punish how much you spend.
+              </li>
               <li>Monsters level up every few XP and evolve at levels 10 and 20.</li>
             </ul>
           </section>
@@ -91,7 +102,7 @@ export function QuestsPage() {
       <Celebration
         open={celebration !== null}
         title="You did it!"
-        message={celebration ? `${celebration.quest} is complete.` : ''}
+        message={celebration ? `${celebration.quest} is complete.` : ""}
         reward={celebration?.reward}
         onClose={() => setCelebration(null)}
       />
@@ -108,7 +119,15 @@ function SummaryTile({ label, value }: { label: string; value: string }) {
   );
 }
 
-function QuestSection({ title, subtitle, children }: { title: string; subtitle: string; children: ReactNode }) {
+function QuestSection({
+  title,
+  subtitle,
+  children,
+}: {
+  title: string;
+  subtitle: string;
+  children: ReactNode;
+}) {
   return (
     <section>
       <div className="mb-3 flex items-baseline justify-between">

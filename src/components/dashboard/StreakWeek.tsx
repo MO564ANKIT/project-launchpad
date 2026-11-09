@@ -1,8 +1,8 @@
-import { Flame } from 'lucide-react';
-import { Button } from '@/components/kit/Button';
-import { parseDateKey } from '@/lib/dates';
-import { recentActivityDays } from '@/lib/progress';
-import type { GameEvent } from '@/types';
+import { Flame } from "lucide-react";
+import { Button } from "@/components/kit/Button";
+import { parseDateKey } from "@/lib/dates";
+import { recentActivityDays } from "@/lib/progress";
+import type { GameEvent } from "@/types";
 
 interface StreakWeekProps {
   events: GameEvent[];
@@ -33,20 +33,22 @@ export function StreakWeek({ events, todayKey, streak, onLogToday }: StreakWeekP
             <span
               className={`flex h-12 w-12 items-center justify-center rounded-full border-2 transition duration-300 sm:h-14 sm:w-14 ${
                 day.active
-                  ? 'border-amber-400 bg-amber-500/20 text-amber-300 shadow-glow-amber'
-                  : 'border-white/10 bg-night-950/60 text-ink-500'
+                  ? "border-amber-400 bg-amber-500/20 text-amber-300 shadow-glow-amber"
+                  : "border-white/10 bg-night-950/60 text-ink-500"
               }`}
             >
-              <Flame className={day.active ? 'h-5 w-5' : 'h-4 w-4 opacity-40'} aria-hidden="true" />
-              <span className="sr-only">{day.active ? 'Logged' : 'Not logged'}</span>
+              <Flame className={day.active ? "h-5 w-5" : "h-4 w-4 opacity-40"} aria-hidden="true" />
+              <span className="sr-only">{day.active ? "Logged" : "Not logged"}</span>
             </span>
             <span className="text-[11px] font-bold uppercase tracking-wider text-ink-400">
-              {parseDateKey(day.key).toLocaleDateString('en-US', { weekday: 'short' })}
+              {parseDateKey(day.key).toLocaleDateString("en-US", { weekday: "short" })}
             </span>
           </li>
         ))}
       </ol>
-      <p className="mt-5 text-center text-xs text-ink-400">Log something every day to keep the flame lit.</p>
+      <p className="mt-5 text-center text-xs text-ink-400">
+        Log something every day to keep the flame lit.
+      </p>
     </section>
   );
 }

@@ -1,8 +1,8 @@
-import { ACHIEVEMENTS } from '@/lib/achievements';
-import { MONSTER_IDS, MONSTER_SPECIES, getLevelProgress } from '@/lib/monsters';
-import { QUESTS, countQuestProgress, questRecordKey } from '@/lib/quests';
-import { dateKeyOf, shiftDateKey } from '@/lib/dates';
-import type { GameEvent, GameState, PlayerStats } from '@/types';
+import { ACHIEVEMENTS } from "@/lib/achievements";
+import { MONSTER_IDS, MONSTER_SPECIES, getLevelProgress } from "@/lib/monsters";
+import { QUESTS, countQuestProgress, questRecordKey } from "@/lib/quests";
+import { dateKeyOf, shiftDateKey } from "@/lib/dates";
+import type { GameEvent, GameState, PlayerStats } from "@/types";
 
 export function computeStreak(events: GameEvent[], todayKey: string): number {
   const activeDays = new Set(events.map((event) => dateKeyOf(event.at)));
@@ -15,7 +15,11 @@ export function computeStreak(events: GameEvent[], todayKey: string): number {
   return streak;
 }
 
-export function recentActivityDays(events: GameEvent[], todayKey: string, days: number): { key: string; active: boolean }[] {
+export function recentActivityDays(
+  events: GameEvent[],
+  todayKey: string,
+  days: number,
+): { key: string; active: boolean }[] {
   const activeDays = new Set(events.map((event) => dateKeyOf(event.at)));
   return Array.from({ length: days }, (_, index) => {
     const key = shiftDateKey(todayKey, index - (days - 1));
@@ -25,19 +29,22 @@ export function recentActivityDays(events: GameEvent[], todayKey: string, days: 
 
 export function computeStats(state: GameState, todayKey: string): PlayerStats {
   const events = state.events;
-  const countEvents = (type: GameEvent['type']) => events.filter((event) => event.type === type).length;
+  const countEvents = (type: GameEvent["type"]) =>
+    events.filter((event) => event.type === type).length;
 
   return {
     expenseCount: state.expenses.length,
-    questsCompleted: countEvents('quest_completed'),
+    questsCompleted: countEvents("quest_completed"),
     budgetSet: state.monthlyBudgetPaise !== null,
-    simulations: countEvents('simulation'),
-    cartsAbandoned: countEvents('cart_abandoned'),
-    purchasesCompleted: countEvents('purchase_completed'),
-    purchasesSkipped: countEvents('purchase_skipped'),
+    simulations: countEvents("simulation"),
+    cartsAbandoned: countEvents("cart_abandoned"),
+    purchasesCompleted: countEvents("purchase_completed"),
+    purchasesSkipped: countEvents("purchase_skipped"),
     unlockedMonsters: MONSTER_IDS.filter((id) => state.monsters[id].unlockedAt !== null).length,
     totalMonsters: MONSTER_IDS.length,
-    highestStage: Math.max(...MONSTER_IDS.map((id) => getLevelProgress(state.monsters[id].xp).stage)),
+    highestStage: Math.max(
+      ...MONSTER_IDS.map((id) => getLevelProgress(state.monsters[id].xp).stage),
+    ),
     streak: computeStreak(events, todayKey),
   };
 }
@@ -45,7 +52,9 @@ export function computeStats(state: GameState, todayKey: string): PlayerStats {
 export function finalizeState(state: GameState, at: string): GameState {
   const todayKey = dateKeyOf(at);
 
-  const currentQuestKeys = new Set(QUESTS.map((quest) => questRecordKey(quest.id, quest.period, todayKey)));
+  const currentQuestKeys = new Set(
+    QUESTS.map((quest) => questRecordKey(quest.id, quest.period, todayKey)),
+  );
   const quests = Object.fromEntries(
     Object.entries(state.quests).filter(([key]) => currentQuestKeys.has(key)),
   );

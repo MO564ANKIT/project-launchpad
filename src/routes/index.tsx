@@ -12,10 +12,14 @@ export const Route = createFileRoute("/")({
         content:
           "A budgeting game: track spending, level up spending monsters, complete money quests, and get roasted by a friendly AI.",
       },
-      { property: "og:title", content: "Spendemon - Your Wallet Is Cooked. Your Monsters Are Thriving." },
+      {
+        property: "og:title",
+        content: "Spendemon - Your Wallet Is Cooked. Your Monsters Are Thriving.",
+      },
       {
         property: "og:description",
-        content: "A budgeting game: track spending, level up spending monsters, complete money quests, and get roasted by a friendly AI.",
+        content:
+          "A budgeting game: track spending, level up spending monsters, complete money quests, and get roasted by a friendly AI.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

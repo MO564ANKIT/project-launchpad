@@ -1,9 +1,9 @@
-import { ArrowRight, Receipt } from 'lucide-react';
-import { Button } from '@/components/kit/Button';
-import { CategoryTag } from '@/components/kit/CategoryTag';
-import { dayHeading } from '@/components/expenses/ExpenseList';
-import { formatMoney } from '@/lib/money';
-import type { Expense } from '@/types';
+import { ArrowRight, Receipt } from "lucide-react";
+import { Button } from "@/components/kit/Button";
+import { CategoryTag } from "@/components/kit/CategoryTag";
+import { dayHeading } from "@/components/expenses/ExpenseList";
+import { formatMoney } from "@/lib/money";
+import type { Expense } from "@/types";
 
 const RECENT_LIMIT = 5;
 
@@ -25,7 +25,9 @@ export function RecentExpenses({ expenses, today, onViewAll }: RecentExpensesPro
           <h2 className="flex items-center gap-2 text-lg font-bold text-ink-50">
             <Receipt className="h-5 w-5 text-neon-300" /> Recent expenses
           </h2>
-          <p className="mt-1 text-sm text-ink-300">Your latest {RECENT_LIMIT} entries, newest first.</p>
+          <p className="mt-1 text-sm text-ink-300">
+            Your latest {RECENT_LIMIT} entries, newest first.
+          </p>
         </div>
         <Button variant="subtle" size="sm" onClick={onViewAll}>
           All expenses <ArrowRight className="h-4 w-4" />
@@ -54,7 +56,9 @@ export function RecentExpenses({ expenses, today, onViewAll }: RecentExpensesPro
                   <span className="text-xs text-ink-400">{dayHeading(expense.date, today)}</span>
                 </div>
               </div>
-              <p className="shrink-0 font-display text-lg font-bold text-ink-50">{formatMoney(expense.amountPaise)}</p>
+              <p className="shrink-0 font-display text-lg font-bold text-ink-50">
+                {formatMoney(expense.amountPaise)}
+              </p>
             </li>
           ))}
         </ul>

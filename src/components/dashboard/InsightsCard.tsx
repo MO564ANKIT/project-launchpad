@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { BrainCircuit, CheckCircle2, ClipboardList, Loader2, Sparkles } from 'lucide-react';
-import { Button } from '@/components/kit/Button';
-import { financialInsights, type InsightsResponse } from '@/lib/financeAi.functions';
-import { useGame } from '@/state/gameContext';
+import { useState } from "react";
+import { BrainCircuit, CheckCircle2, ClipboardList, Loader2, Sparkles } from "lucide-react";
+import { Button } from "@/components/kit/Button";
+import { financialInsights, type InsightsResponse } from "@/lib/financeAi.functions";
+import { useGame } from "@/state/gameContext";
 
 type Loaded = Extract<InsightsResponse, { ok: true }>;
 
@@ -21,14 +21,14 @@ export function InsightsCard() {
       if (response.ok) setResult(response);
       else setError(response.error);
     } catch {
-      setError('Insights could not be reached. Check your connection and try again.');
+      setError("Insights could not be reached. Check your connection and try again.");
     } finally {
       setLoading(false);
     }
   };
 
   const markReviewed = () => {
-    recordEvent('spending_reviewed');
+    recordEvent("spending_reviewed");
     setReviewed(true);
   };
 
@@ -39,23 +39,34 @@ export function InsightsCard() {
           <h2 className="flex items-center gap-2 text-lg font-bold text-ink-50">
             <BrainCircuit className="h-5 w-5 text-volt-300" /> AI financial insights
           </h2>
-          <p className="mt-1 text-sm text-ink-300">Your recorded numbers first, then AI suggestions based only on them.</p>
+          <p className="mt-1 text-sm text-ink-300">
+            Your recorded numbers first, then AI suggestions based only on them.
+          </p>
         </div>
         <Button variant="volt" size="sm" onClick={load} disabled={loading}>
-          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-          {result ? 'Refresh insights' : 'Get insights'}
+          {loading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Sparkles className="h-4 w-4" />
+          )}
+          {result ? "Refresh insights" : "Get insights"}
         </Button>
       </div>
 
       {error && (
-        <p role="alert" className="rounded-2xl border border-rose-400/40 bg-rose-500/10 p-4 text-sm text-rose-200">
+        <p
+          role="alert"
+          className="rounded-2xl border border-rose-400/40 bg-rose-500/10 p-4 text-sm text-rose-200"
+        >
           {error}
         </p>
       )}
 
       {!result && !error && (
         <p className="rounded-xl border border-dashed border-white/15 p-6 text-center text-sm text-ink-300">
-          {loading ? 'Reading your recorded spending...' : 'Tap “Get insights” for a weekly summary, a budget tip, a savings idea and a quest suggestion.'}
+          {loading
+            ? "Reading your recorded spending..."
+            : "Tap “Get insights” for a weekly summary, a budget tip, a savings idea and a quest suggestion."}
         </p>
       )}
 
@@ -73,14 +84,16 @@ export function InsightsCard() {
           </div>
           <div className="rounded-2xl border border-volt-500/30 bg-volt-500/10 p-5">
             <h3 className="text-sm font-bold uppercase tracking-wider text-volt-300">
-              {result.suggestionSource === 'ai' ? 'AI suggestions' : 'Suggestions (AI unavailable)'}
+              {result.suggestionSource === "ai" ? "AI suggestions" : "Suggestions (AI unavailable)"}
             </h3>
             <ul className="mt-3 space-y-2 text-sm text-ink-100">
               {result.suggestions.map((line) => (
                 <li key={line}>{line}</li>
               ))}
             </ul>
-            <p className="mt-3 text-xs text-ink-400">Suggestions are guidance, not financial advice.</p>
+            <p className="mt-3 text-xs text-ink-400">
+              Suggestions are guidance, not financial advice.
+            </p>
           </div>
           <div className="md:col-span-2 flex justify-end">
             {reviewed ? (

@@ -1,6 +1,6 @@
-import { motion } from 'framer-motion';
-import { Flame, PawPrint, Receipt, Scroll, ShoppingBag, type LucideIcon } from 'lucide-react';
-import type { PageId } from '@/components/layout/BottomNav';
+import { motion } from "framer-motion";
+import { Flame, PawPrint, Receipt, Scroll, ShoppingBag, type LucideIcon } from "lucide-react";
+import type { PageId } from "@/components/layout/BottomNav";
 
 interface ActionDef {
   id: PageId;
@@ -12,11 +12,46 @@ interface ActionDef {
 }
 
 const ACTIONS: ActionDef[] = [
-  { id: 'expenses', label: 'Log spend', icon: Receipt, ring: 'border-neon-400', hover: 'group-hover:shadow-glow-neon', text: 'text-neon-300' },
-  { id: 'quests', label: 'Quests', icon: Scroll, ring: 'border-amber-400', hover: 'group-hover:shadow-glow-amber', text: 'text-amber-300' },
-  { id: 'monsters', label: 'Monsters', icon: PawPrint, ring: 'border-rose-400', hover: 'group-hover:shadow-glow-rose', text: 'text-rose-300' },
-  { id: 'shop', label: 'Loot Shop', icon: ShoppingBag, ring: 'border-volt-400', hover: 'group-hover:shadow-glow-volt', text: 'text-volt-300' },
-  { id: 'roast', label: 'AI Roast', icon: Flame, ring: 'border-lime-400', hover: 'group-hover:shadow-glow-neon', text: 'text-lime-300' },
+  {
+    id: "expenses",
+    label: "Log spend",
+    icon: Receipt,
+    ring: "border-neon-400",
+    hover: "group-hover:shadow-glow-neon",
+    text: "text-neon-300",
+  },
+  {
+    id: "quests",
+    label: "Quests",
+    icon: Scroll,
+    ring: "border-amber-400",
+    hover: "group-hover:shadow-glow-amber",
+    text: "text-amber-300",
+  },
+  {
+    id: "monsters",
+    label: "Monsters",
+    icon: PawPrint,
+    ring: "border-rose-400",
+    hover: "group-hover:shadow-glow-rose",
+    text: "text-rose-300",
+  },
+  {
+    id: "shop",
+    label: "Loot Shop",
+    icon: ShoppingBag,
+    ring: "border-volt-400",
+    hover: "group-hover:shadow-glow-volt",
+    text: "text-volt-300",
+  },
+  {
+    id: "roast",
+    label: "AI Roast",
+    icon: Flame,
+    ring: "border-lime-400",
+    hover: "group-hover:shadow-glow-neon",
+    text: "text-lime-300",
+  },
 ];
 
 interface QuickActionsProps {

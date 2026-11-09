@@ -1,5 +1,17 @@
-import { Bus, Coffee, CircleDot, HeartPulse, PartyPopper, PiggyBank, Receipt, Repeat, ShoppingBag, Utensils, type LucideIcon } from 'lucide-react';
-import type { Category } from '@/lib/categories';
+import {
+  Bus,
+  Coffee,
+  CircleDot,
+  HeartPulse,
+  PartyPopper,
+  PiggyBank,
+  Receipt,
+  Repeat,
+  ShoppingBag,
+  Utensils,
+  type LucideIcon,
+} from "lucide-react";
+import type { Category } from "@/lib/categories";
 
 const CATEGORY_ICONS: Record<Category, LucideIcon> = {
   food: Utensils,
