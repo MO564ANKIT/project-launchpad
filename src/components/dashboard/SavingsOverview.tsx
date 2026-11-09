@@ -1,4 +1,7 @@
-import { ArrowRight, Check, PiggyBank, Receipt } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowRight, Check, Loader2, PiggyBank, Play, Receipt, RotateCcw } from 'lucide-react';
+import { demoJourney } from '@/lib/demo.functions';
+import { useToast } from '@/components/kit/Toast';
 import type { PageId } from '@/components/layout/BottomNav';
 import { Button } from '@/components/kit/Button';
 import { ProgressBar } from '@/components/kit/ProgressBar';
@@ -7,7 +10,7 @@ import { SandboxBadge } from '@/components/checkout/SandboxBadge';
 import { StatusPill } from '@/components/checkout/StatusPill';
 import { LOOT_BY_ID } from '@/lib/lootCatalogue';
 import { formatUsdCents } from '@/lib/money';
-import { goalProgress, useGoals, useTransactions } from '@/lib/ledger';
+import { goalProgress, totalSavedCents, useGoals, useRefreshLedger, useTransactions } from '@/lib/ledger';
 import { cn } from '@/lib/cn';
 import { useGame } from '@/state/gameContext';
 
@@ -15,6 +18,28 @@ export function SavingsOverview({ onNavigate }: { onNavigate: (page: PageId) => 
   const goals = useGoals();
   const transactions = useTransactions();
   const { state } = useGame();
+  const refresh = useRefreshLedger();
+  const toast = useToast();
+  const [demoBusy, setDemoBusy] = useState<'start' | 'reset' | null>(null);
+  const txRows = transactions.data ?? [];
+  const savedReal = totalSavedCents(txRows);
+  const savedDemo = totalSavedCents(txRows, true) - savedReal;
+  const hasDemo = txRows.some((tx) => tx.is_demo) || (goals.data ?? []).some((goal) => goal.is_demo);
+
+  const runDemo = async (action: 'start' | 'reset') => {
+    setDemoBusy(action);
+    try {
+      const result = await demoJourney({ data: { action } });
+      if (result.ok) {
+        await refresh();
+        toast(action === 'start' ? 'Demo journey started: a sample goal and payment were added.' : 'Demo data removed.');
+      } else toast(result.error, 'error');
+    } catch {
+      toast('The demo could not be updated. Please try again.', 'error');
+    } finally {
+      setDemoBusy(null);
+    }
+  };
   const activeGoal = (goals.data ?? []).find((goal) => !goal.completed_at) ?? goals.data?.[0] ?? null;
   const recent = (transactions.data ?? []).slice(0, 4);
   const goalNames = Object.fromEntries((goals.data ?? []).map((goal) => [goal.id, goal.name])) as Record<string, string>;
@@ -38,6 +63,19 @@ export function SavingsOverview({ onNavigate }: { onNavigate: (page: PageId) => 
           </h2>
           <SandboxBadge />
         </div>
+        <div className="mb-5 rounded-2xl bg-night-950/50 p-4">
+          <p className="text-xs font-bold uppercase tracking-wider text-ink-400">Total saved via PayPal</p>
+          {transactions.isLoading ? (
+            <Skeleton className="mt-2 h-8 w-32" />
+          ) : (
+            <>
+              <p className="mt-1 font-display text-3xl font-bold text-neon-300">{formatUsdCents(savedReal)}</p>
+              <p className="text-xs text-ink-400">
+                Verified Sandbox contributions{savedDemo > 0 ? ` · plus ${formatUsdCents(savedDemo)} of demo data` : ''}
+              </p>
+            </>
+          )}
+        </div>
         {goals.isLoading ? (
           <Skeleton className="h-24" />
         ) : activeGoal ? (
@@ -57,7 +95,18 @@ export function SavingsOverview({ onNavigate }: { onNavigate: (page: PageId) => 
         </Button>
 
         <div className="mt-6 border-t border-white/10 pt-5">
-          <p className="text-xs font-bold uppercase tracking-wider text-ink-400">Demo journey</p>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-xs font-bold uppercase tracking-wider text-ink-400">Demo journey</p>
+            <div className="flex gap-2">
+              <Button variant="volt" size="sm" onClick={() => runDemo('start')} disabled={demoBusy !== null}>
+                {demoBusy === 'start' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />} Start demo
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => runDemo('reset')} disabled={demoBusy !== null || !hasDemo}>
+                {demoBusy === 'reset' ? <Loader2 className="h-4 w-4 animate-spin" /> : <RotateCcw className="h-4 w-4" />} Reset demo
+              </Button>
+            </div>
+          </div>
+          <p className="mt-2 text-xs text-ink-400">Adds a sample goal and payment to your account only, clearly marked as demo. Reset removes them.</p>
           <ol className="mt-3 space-y-2">
             {steps.map((step, index) => (
               <li key={step.label}>
