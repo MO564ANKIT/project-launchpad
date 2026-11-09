@@ -1,7 +1,9 @@
 import { useMemo, useState } from 'react';
 import { Search, Vault as VaultIcon } from 'lucide-react';
 import { EmptyState } from '@/components/kit/EmptyState';
-import { Modal } from '@/components/kit/Modal';
+import { SidePanel } from '@/components/kit/SidePanel';
+import { buildTimeline, filterByDateRange, type DateRange } from '@/lib/vault';
+import { cn } from '@/lib/cn';
 import { Skeleton } from '@/components/kit/Skeleton';
 import { SandboxBadge } from '@/components/checkout/SandboxBadge';
 import { STATUS_LABEL, StatusPill } from '@/components/checkout/StatusPill';
@@ -25,6 +27,7 @@ export function VaultPage() {
   const [query, setQuery] = useState('');
   const [kind, setKind] = useState<KindFilter>('all');
   const [status, setStatus] = useState<StatusFilter>('all');
+  const [range, setRange] = useState<DateRange>('all');
   const [selected, setSelected] = useState<PaypalTransaction | null>(null);
 
   const goalNames = useMemo(
@@ -40,7 +43,7 @@ export function VaultPage() {
 
   const rows = transactions.data ?? [];
   const needle = query.trim().toLowerCase();
-  const filtered = rows.filter((tx) => {
+  const filtered = filterByDateRange(rows, range, new Date()).filter((tx) => {
     if (kind !== 'all' && tx.kind !== kind) return false;
     if (status !== 'all' && tx.status !== status) return false;
     if (!needle) return true;
@@ -72,8 +75,8 @@ export function VaultPage() {
       </div>
 
       <section className="card space-y-5 p-6">
-        <div className="grid gap-3 md:grid-cols-[1fr_auto_auto]">
-          <label className="relative block">
+        <div className="grid gap-3 sm:grid-cols-3 md:grid-cols-[1fr_auto_auto_auto]">
+          <label className="relative block sm:col-span-3 md:col-span-1">
             <span className="sr-only">Search transactions</span>
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400" aria-hidden="true" />
             <input
@@ -87,6 +90,12 @@ export function VaultPage() {
             <option value="all">All types</option>
             <option value="goal_contribution">Goal contributions</option>
             <option value="shop">Marketplace</option>
+          </Select>
+          <Select label="Date" value={range} onChange={(value) => setRange(value as DateRange)}>
+            <option value="all">Any date</option>
+            <option value="7d">Last 7 days</option>
+            <option value="30d">Last 30 days</option>
+            <option value="90d">Last 90 days</option>
           </Select>
           <Select label="Status" value={status} onChange={(value) => setStatus(value as StatusFilter)}>
             <option value="all">All statuses</option>
@@ -144,20 +153,44 @@ export function VaultPage() {
         )}
       </section>
 
-      <Modal open={selected !== null} onClose={() => setSelected(null)} title="Transaction details" description="PayPal Sandbox demo. No real money moved.">
+      <SidePanel open={selected !== null} onClose={() => setSelected(null)} title="Transaction details" description="PayPal Sandbox demo. No real money moved.">
         {selected && (
-          <dl className="grid gap-3 text-sm sm:grid-cols-2">
-            <Detail label="What" value={describe(selected)} wide />
-            <Detail label="Status" value={<StatusPill status={selected.status} />} />
-            <Detail label="Amount" value={`${formatUsdCents(selected.amount_cents)} ${selected.currency}`} />
-            <Detail label="Started" value={formatDateTime(selected.created_at)} />
-            <Detail label="Verified" value={formatDateTime(selected.captured_at)} />
-            <Detail label="PayPal order ID" value={selected.paypal_order_id} wide mono />
-            <Detail label="PayPal capture ID" value={selected.paypal_capture_id ?? 'Not captured'} wide mono />
-            {selected.failure_reason && <Detail label="Reason" value={selected.failure_reason} wide />}
-          </dl>
+          <div className="space-y-6">
+            <dl className="grid gap-3 text-sm sm:grid-cols-2">
+              <Detail label="What" value={describe(selected)} wide />
+              <Detail label="Status" value={<StatusPill status={selected.status} />} />
+              <Detail label="Amount" value={`${formatUsdCents(selected.amount_cents)} ${selected.currency}`} />
+              <Detail label="PayPal order ID" value={selected.paypal_order_id} wide mono />
+              <Detail label="PayPal capture ID" value={selected.paypal_capture_id ?? 'Not captured'} wide mono />
+              {selected.failure_reason && <Detail label="Reason" value={selected.failure_reason} wide />}
+            </dl>
+            <section>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-ink-400">Status timeline</h3>
+              <ol className="mt-3 space-y-0">
+                {buildTimeline(selected).map((step, index, all) => (
+                  <li key={step.label} className="relative flex gap-3 pb-5 last:pb-0">
+                    {index < all.length - 1 && <span className="absolute left-[7px] top-4 h-full w-px bg-white/15" aria-hidden="true" />}
+                    <span
+                      className={cn(
+                        'relative mt-1 h-[15px] w-[15px] shrink-0 rounded-full border-2',
+                        step.state === 'done' && 'border-neon-400 bg-neon-500',
+                        step.state === 'current' && 'animate-pulse border-amber-300 bg-amber-500/40',
+                        step.state === 'failed' && 'border-rose-400 bg-rose-500',
+                        step.state === 'upcoming' && 'border-white/25 bg-transparent',
+                      )}
+                      aria-hidden="true"
+                    />
+                    <div>
+                      <p className={cn('text-sm font-semibold', step.state === 'upcoming' ? 'text-ink-400' : 'text-ink-50')}>{step.label}</p>
+                      <p className="text-xs text-ink-400">{step.at ? formatDateTime(step.at) : step.state === 'current' ? 'In progress' : '—'}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          </div>
         )}
-      </Modal>
+      </SidePanel>
     </div>
   );
 }
