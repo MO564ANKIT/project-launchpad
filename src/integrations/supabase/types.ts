@@ -154,6 +154,7 @@ export type Database = {
           name: string
           target_cents: number
           user_id: string
+          withdrawn_cents: number
         }
         Insert: {
           completed_at?: string | null
@@ -165,6 +166,7 @@ export type Database = {
           name: string
           target_cents: number
           user_id?: string
+          withdrawn_cents?: number
         }
         Update: {
           completed_at?: string | null
@@ -176,6 +178,7 @@ export type Database = {
           name?: string
           target_cents?: number
           user_id?: string
+          withdrawn_cents?: number
         }
         Relationships: []
       }
@@ -191,6 +194,7 @@ export type Database = {
           is_demo: boolean
           item_ids: string[]
           kind: string
+          payout_batch_id: string | null
           paypal_capture_id: string | null
           paypal_order_id: string
           refund_reversed_at: string | null
@@ -209,6 +213,7 @@ export type Database = {
           is_demo?: boolean
           item_ids: string[]
           kind?: string
+          payout_batch_id?: string | null
           paypal_capture_id?: string | null
           paypal_order_id: string
           refund_reversed_at?: string | null
@@ -227,6 +232,7 @@ export type Database = {
           is_demo?: boolean
           item_ids?: string[]
           kind?: string
+          payout_batch_id?: string | null
           paypal_capture_id?: string | null
           paypal_order_id?: string
           refund_reversed_at?: string | null
@@ -288,8 +294,16 @@ export type Database = {
         Args: { _capture_id: string; _order_id: string }
         Returns: Json
       }
+      reserve_goal_payout: {
+        Args: { _goal_id: string; _simulate: boolean; _user_id: string }
+        Returns: Json
+      }
       reset_demo_journey: { Args: { _user_id: string }; Returns: undefined }
       reverse_paypal_order: { Args: { _capture_id: string }; Returns: Json }
+      settle_goal_payout: {
+        Args: { _batch_id: string; _order_id: string; _simulate: boolean }
+        Returns: undefined
+      }
       start_demo_journey: { Args: { _user_id: string }; Returns: Json }
     }
     Enums: {
