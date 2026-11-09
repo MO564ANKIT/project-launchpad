@@ -66,7 +66,7 @@ export function ExpensesPage() {
       </section>
 
       <div className="grid gap-6 lg:grid-cols-5">
-        <section className="card p-5 sm:p-7 lg:col-span-3">
+        <section className="card min-w-0 p-5 sm:p-7 lg:col-span-3">
           <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-lg font-bold text-ink-50">All expenses</h2>
             <div className="flex flex-wrap gap-1.5" role="group" aria-label="Filter by category">
@@ -117,7 +117,7 @@ export function ExpensesPage() {
           )}
         </section>
 
-        <section className="card p-5 sm:p-7 lg:col-span-2">
+        <section className="card min-w-0 p-5 sm:p-7 lg:col-span-2">
           <h2 className="mb-1 text-lg font-bold text-ink-50">Category breakdown</h2>
           <p className="mb-5 text-xs text-ink-400">
             This month. Bars show budget use when a category limit is set.
