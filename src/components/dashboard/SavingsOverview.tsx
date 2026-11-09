@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { ArrowRight, Check, Loader2, PiggyBank, Play, Receipt, RotateCcw } from 'lucide-react';
 import { demoJourney } from '@/lib/demo.functions';
-import { useToast } from '@/components/kit/Toast';
+import { Toast } from '@/components/kit/Toast';
 import type { PageId } from '@/components/layout/BottomNav';
 import { Button } from '@/components/kit/Button';
 import { ProgressBar } from '@/components/kit/ProgressBar';
@@ -19,7 +19,9 @@ export function SavingsOverview({ onNavigate }: { onNavigate: (page: PageId) => 
   const transactions = useTransactions();
   const { state } = useGame();
   const refresh = useRefreshLedger();
-  const toast = useToast();
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const dismissToast = useCallback(() => setToastMsg(null), []);
+  const toast = (message: string, _tone?: 'error') => setToastMsg(message);
   const [demoBusy, setDemoBusy] = useState<'start' | 'reset' | null>(null);
   const txRows = transactions.data ?? [];
   const savedReal = totalSavedCents(txRows);
@@ -56,6 +58,7 @@ export function SavingsOverview({ onNavigate }: { onNavigate: (page: PageId) => 
 
   return (
     <div className="grid gap-6 lg:grid-cols-12">
+      <Toast message={toastMsg} onDismiss={dismissToast} />
       <section className="card p-6 sm:p-8 lg:col-span-5">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <h2 className="flex items-center gap-2 text-lg font-bold text-ink-50">
