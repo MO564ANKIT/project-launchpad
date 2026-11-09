@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { RouteError } from "@/components/app/RouteError";
 import { LootShopPage } from "@/screens/LootShopPage";
 
 export const Route = createFileRoute("/loot-shop")({
@@ -12,5 +13,6 @@ export const Route = createFileRoute("/loot-shop")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  errorComponent: RouteError,
   component: LootShopPage,
 });

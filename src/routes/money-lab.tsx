@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { RouteError } from "@/components/app/RouteError";
 import { MoneyLabPage } from "@/screens/MoneyLabPage";
 
 export const Route = createFileRoute("/money-lab")({
@@ -12,5 +13,6 @@ export const Route = createFileRoute("/money-lab")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  errorComponent: RouteError,
   component: MoneyLabPage,
 });

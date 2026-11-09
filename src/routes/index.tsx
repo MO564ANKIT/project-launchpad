@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { RouteError } from "@/components/app/RouteError";
 import { DashboardPage } from "@/screens/DashboardPage";
 import { usePageNavigate } from "@/components/app/usePageNavigate";
 
@@ -20,6 +21,7 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  errorComponent: RouteError,
   component: Home,
 });
 
