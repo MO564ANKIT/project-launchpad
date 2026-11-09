@@ -48,6 +48,7 @@ export function VaultPage() {
   );
 
   const describe = (tx: PaypalTransaction): string => {
+    if (tx.kind === "payout") return tx.is_demo ? "Simulated payout" : "Savings Vault withdrawal";
     if (tx.kind === "goal_contribution")
       return `Contribution to ${tx.goal_id ? (goalNames[tx.goal_id] ?? "a savings goal") : "a savings goal"}`;
     const names = tx.item_ids.map((id) => LOOT_BY_ID[id]?.name ?? id);
@@ -66,10 +67,10 @@ export function VaultPage() {
   });
 
   const verifiedTotal = rows
-    .filter((tx) => tx.status === "completed")
+    .filter((tx) => tx.status === "completed" && !tx.is_demo && tx.kind !== "payout")
     .reduce((sum, tx) => sum + tx.amount_cents, 0);
   const savedTotal = rows
-    .filter((tx) => tx.status === "completed" && tx.kind === "goal_contribution")
+    .filter((tx) => tx.status === "completed" && !tx.is_demo && tx.kind === "goal_contribution")
     .reduce((sum, tx) => sum + tx.amount_cents, 0);
 
   return (
@@ -91,7 +92,7 @@ export function VaultPage() {
       <div className="grid gap-4 sm:grid-cols-3">
         <Tile
           label="Verified payments"
-          value={String(rows.filter((tx) => tx.status === "completed").length)}
+          value={String(rows.filter((tx) => tx.status === "completed" && !tx.is_demo && tx.kind !== "payout").length)}
         />
         <Tile label="Verified total" value={formatUsdCents(verifiedTotal)} />
         <Tile label="Saved toward goals" value={formatUsdCents(savedTotal)} />
@@ -116,6 +117,7 @@ export function VaultPage() {
             <option value="all">All types</option>
             <option value="goal_contribution">Goal contributions</option>
             <option value="shop">Marketplace</option>
+            <option value="payout">Withdrawals</option>
           </Select>
           <Select label="Date" value={range} onChange={(value) => setRange(value as DateRange)}>
             <option value="all">Any date</option>
@@ -178,6 +180,7 @@ export function VaultPage() {
                   </div>
                   <div className="flex items-center gap-3">
                     <StatusPill status={tx.status} />
+                    {tx.is_demo && <span className="text-xs font-bold text-amber-300">Simulated</span>}
                     <span className="font-display text-lg font-bold text-ink-50">
                       {formatUsdCents(tx.amount_cents)}
                     </span>

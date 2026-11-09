@@ -42,6 +42,7 @@ export interface CheckoutBody {
   milestones?: number[];
   message?: string;
   alreadyCompleted?: boolean;
+  simulated?: boolean;
 }
 
 export type CheckoutResult = { ok: true; body: CheckoutBody } | { ok: false; error: string };

@@ -10,6 +10,7 @@ export interface CheckoutInput {
   orderId?: string;
   goalId?: string;
   amountCents?: number;
+  simulated?: boolean;
 }
 
 export interface CheckoutBody {
@@ -22,6 +23,8 @@ export interface CheckoutBody {
   amountCents?: number;
   milestones?: number[];
   message?: string;
+  simulated?: boolean;
+  alreadyCompleted?: boolean;
 }
 
 export type CheckoutResponse =
@@ -47,6 +50,7 @@ export const paypalCheckout = createServerFn({ method: "POST" })
     }
     return {
       action: input.action,
+      simulated: input.simulated === true,
       itemIds: Array.isArray(input.itemIds) ? input.itemIds.slice(0, 50) : undefined,
       orderId: typeof input.orderId === "string" ? input.orderId.slice(0, 64) : undefined,
       goalId: typeof input.goalId === "string" ? input.goalId.slice(0, 64) : undefined,
@@ -57,6 +61,11 @@ export const paypalCheckout = createServerFn({ method: "POST" })
     try {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const checkout = await import("./checkout-server/paypal.server");
+      const judge = context.claims.app_metadata?.judge_mode === true;
+      if (data.simulated || judge || (typeof data.orderId === "string" && data.orderId.startsWith("DEMO"))) {
+        const { simulateCheckout } = await import("./checkout-server/simulate.server");
+        return await simulateCheckout(supabaseAdmin, context.userId, data);
+      }
       if (!checkout.paypalConfigured()) {
         const { paypalSetupStatus, logMissingPaypalSecrets } =
           await import("./checkout-server/setupStatus");
@@ -97,15 +106,16 @@ export const paypalCheckout = createServerFn({ method: "POST" })
 export interface PaypalSetupView {
   checkoutReady: boolean;
   webhooksReady: boolean;
+  owner: boolean;
 }
 
 // Tells the signed-in player whether Sandbox checkout and webhooks are configured (booleans only).
 export const paypalSetup = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async (): Promise<PaypalSetupView> => {
+  .handler(async ({ context }): Promise<PaypalSetupView> => {
     const { paypalSetupStatus, logMissingPaypalSecrets } =
       await import("./checkout-server/setupStatus");
     const status = paypalSetupStatus(process.env);
     logMissingPaypalSecrets("setup check", status);
-    return { checkoutReady: status.checkoutReady, webhooksReady: status.webhooksReady };
+    return { checkoutReady: status.checkoutReady, webhooksReady: status.webhooksReady, owner: context.userId === process.env["SPENDEMON_OWNER_USER_ID"] };
   });

@@ -9,6 +9,8 @@ import {
 export type CaptureResult =
   | {
       status: "completed";
+      simulated?: boolean;
+      alreadyCompleted?: boolean;
       orderId: string;
       kind: "shop" | "goal_contribution";
       itemIds: string[];
@@ -54,18 +56,20 @@ function readApproval(data: CheckoutBody): { orderId: string; approveUrl: string
 
 export async function createPaypalOrder(
   itemIds: string[],
+  simulated = false,
 ): Promise<{ orderId: string; approveUrl: string }> {
   const unknownItem = itemIds.find((id) => !LOOT_BY_ID[id] || LOOT_BY_ID[id].earnOnly);
   if (unknownItem || itemIds.length === 0)
     throw new Error("Your cart is empty or has an unknown item.");
-  return readApproval(await postCheckout({ action: "create", itemIds }));
+  return readApproval(await postCheckout({ action: "create", itemIds, simulated }));
 }
 
 export async function createGoalContribution(
   goalId: string,
   amountCents: number,
+  simulated = false,
 ): Promise<{ orderId: string; approveUrl: string }> {
-  return readApproval(await postCheckout({ action: "contribute", goalId, amountCents }));
+  return readApproval(await postCheckout({ action: "contribute", goalId, amountCents, simulated }));
 }
 
 export async function capturePaypalOrder(orderId: string): Promise<CaptureResult> {
@@ -78,6 +82,8 @@ export async function capturePaypalOrder(orderId: string): Promise<CaptureResult
   ) {
     return {
       status: "completed",
+      simulated: data.simulated,
+      alreadyCompleted: data.alreadyCompleted,
       orderId: data.orderId,
       kind: data.kind,
       itemIds: Array.isArray(data.itemIds)

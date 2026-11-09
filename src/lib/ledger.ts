@@ -9,7 +9,7 @@ export interface PaypalTransaction {
   id: string;
   paypal_order_id: string;
   paypal_capture_id: string | null;
-  kind: "shop" | "goal_contribution";
+  kind: "shop" | "goal_contribution" | "payout";
   goal_id: string | null;
   item_ids: string[];
   amount_cents: number;

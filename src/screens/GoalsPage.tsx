@@ -1,3 +1,4 @@
+import { SavingsAutopilot } from "@/components/goals/SavingsAutopilot";
 import { PiggyBank } from "lucide-react";
 import { EmptyState } from "@/components/kit/EmptyState";
 import { SandboxBadge } from "@/components/checkout/SandboxBadge";
@@ -32,13 +33,13 @@ export function GoalsPage() {
         </div>
         <h1 className="text-3xl font-bold text-ink-50 sm:text-4xl">Pay. Save. Evolve.</h1>
         <p className="max-w-2xl text-sm text-ink-300">
-          Set a goal, contribute through PayPal Sandbox, and watch Saverion grow. Progress only
-          moves after our server verifies the capture with PayPal. These are simulated
-          contributions, not real savings deposits.
+          Contributions go to the Spendemon Savings Vault, a PayPal Sandbox merchant account.
+          Verified sandbox payments grow Saverion. Test money only, not bank deposits.
         </p>
       </header>
 
       <SetupNotice />
+      <SavingsAutopilot />
 
       <div className="grid gap-6 lg:grid-cols-5">
         <div className="space-y-6 lg:col-span-3">

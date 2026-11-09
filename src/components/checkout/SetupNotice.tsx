@@ -5,7 +5,7 @@ import { cn } from "@/lib/cn";
 /** Friendly notice when PayPal Sandbox keys or the webhook ID are not configured yet. */
 export function SetupNotice({ className }: { className?: string }) {
   const { data } = usePaypalSetup();
-  if (!data) return null;
+  if (!data || !data.owner) return null;
   if (!data.checkoutReady) {
     return (
       <div
