@@ -77,7 +77,7 @@ export function SavingsOverview({ onNavigate }: { onNavigate: (page: PageId) => 
   return (
     <div className="grid gap-6 lg:grid-cols-12">
       <Toast message={toastMsg} onDismiss={dismissToast} />
-      <section className="card p-6 sm:p-8 lg:col-span-5">
+      <section data-tour="savings" className="card p-6 sm:p-8 lg:col-span-5">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <h2 className="flex items-center gap-2 text-lg font-bold text-ink-50">
             <PiggyBank className="h-5 w-5 text-neon-300" /> PayPal savings quest
@@ -130,7 +130,7 @@ export function SavingsOverview({ onNavigate }: { onNavigate: (page: PageId) => 
           {activeGoal ? "Contribute" : "Create a goal"} <ArrowRight className="h-4 w-4" />
         </Button>
 
-        <div className="mt-6 border-t border-white/10 pt-5">
+        <div data-tour="demo" className="mt-6 border-t border-white/10 pt-5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="text-xs font-bold uppercase tracking-wider text-ink-400">Demo journey</p>
             <div className="flex gap-2">

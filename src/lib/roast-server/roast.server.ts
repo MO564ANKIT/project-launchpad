@@ -4,8 +4,6 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { buildBudgetFacts, isDateKey, readSavedBudgetState } from "./budgetFacts";
 
 const ROAST_LIMIT_PER_HOUR = 30;
-const GEMINI_URL =
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent";
 const MAX_MESSAGE_LENGTH = 200;
 const MAX_HISTORY = 10;
 const MAX_HISTORY_TEXT = 300;
@@ -138,40 +136,26 @@ export async function runRoast(
   const savedState = readSavedBudgetState(saveRow?.state);
   const facts = savedState ? buildBudgetFacts(savedState, message.trim(), today) : [];
 
-  const apiKey = process.env["GEMINI_API_KEY"];
-  if (!apiKey) {
-    // No project Gemini key: use the same Gemini model through Lovable AI.
-    const request = buildRequest(personality, message.trim(), facts, history);
-    const { generateAiText } = await import("../ai-server/ai.server");
-    const result = await generateAiText({
-      system: request.systemInstruction.parts[0].text,
-      user: request.contents[request.contents.length - 1].parts[0].text,
-      history: history.slice(-MAX_HISTORY).map((item) => ({
+  const request = buildRequest(personality, message.trim(), facts, history);
+  const { generateAiText } = await import("../ai-server/ai.server");
+  const result = await generateAiText({
+    system: request.systemInstruction.parts[0].text,
+    user: request.contents[request.contents.length - 1].parts[0].text,
+    history: history
+      .slice(-MAX_HISTORY)
+      .map((item) => ({
         role: item.role === "user" ? "user" : "assistant",
         text: item.text.slice(0, MAX_HISTORY_TEXT),
       })),
-      temperature: 1.0,
-    });
-    if (result.ok) return { ok: true, reply: result.text };
-    if (result.reason === "credits")
-      return { ok: false, error: "The AI roaster is out of credits right now." };
-    if (result.reason === "rate-limit")
-      return { ok: false, error: "Too many roasts at once. Try again in a minute." };
-    return { ok: false, error: "The AI roaster is taking a break. Try again in a moment." };
-  }
-
-  const response = await fetch(GEMINI_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
-    signal: AbortSignal.timeout(45000),
-    body: JSON.stringify(buildRequest(personality, message.trim(), facts, history)),
+    temperature: 1.0,
+    maxOutputTokens: 4096,
   });
-  const data = await response.json().catch(() => null);
-  const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-  if (!response.ok || typeof reply !== "string" || reply.trim().length === 0) {
-    console.error("roast-chat gemini failed", response.status);
-    return { ok: false, error: "The AI roaster is taking a break. Try again in a moment." };
-  }
-  return { ok: true, reply: reply.trim() };
+  if (result.ok) return { ok: true, reply: result.text };
+  return {
+    ok: false,
+    error:
+      result.reason === "credits"
+        ? "The AI roaster is out of credits right now."
+        : "The AI roaster is taking a break. Try again in a moment.",
+  };
 }

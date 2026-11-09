@@ -1,6 +1,9 @@
 import { useState, type FormEvent } from "react";
 import { Flame, KeyRound, LogIn, UserPlus } from "lucide-react";
 import { Button } from "@/components/kit/Button";
+import { useServerFn } from "@tanstack/react-start";
+import { enterJudgeMode } from "@/lib/judge.functions";
+import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/cn";
 import { useAuth } from "@/state/authContext";
 
@@ -12,6 +15,7 @@ const MODES: { id: Exclude<Mode, "reset">; label: string }[] = [
 ];
 
 export function AuthScreen() {
+  const judgeFn = useServerFn(enterJudgeMode);
   const { signIn, signUp, sendPasswordSetup } = useAuth();
   const [mode, setMode] = useState<Mode>("signIn");
   const [email, setEmail] = useState("");
@@ -69,6 +73,29 @@ export function AuthScreen() {
           </div>
         </div>
 
+        <Button
+          variant="volt"
+          className="w-full"
+          disabled={submitting}
+          onClick={async () => {
+            setSubmitting(true);
+            setError(null);
+            try {
+              const session = await judgeFn();
+              const signed = await supabase.auth.setSession(session);
+              if (signed.error) throw signed.error;
+              window.location.assign("/");
+            } catch {
+              setError("Judge mode could not start. Please try again.");
+              setSubmitting(false);
+            }
+          }}
+        >
+          Try as a judge
+        </Button>
+        <p className="text-center text-xs text-amber-300">
+          Isolated demo account · simulated payments · no real money
+        </p>
         <section className="card space-y-6 p-6 sm:p-8">
           {mode === "reset" ? (
             <div className="space-y-2">

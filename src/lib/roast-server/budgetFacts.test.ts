@@ -26,9 +26,9 @@ function stateWith(overrides: Partial<SavedBudgetState> = {}): SavedBudgetState 
 describe("buildBudgetFacts", () => {
   it("reports remaining budget, streak and spending from saved state only", () => {
     const facts = buildBudgetFacts(stateWith(), "check my month", TODAY);
-    expect(facts).toContain("Left in this month's budget: \u20B97,500.00.");
+    expect(facts).toContain("Left in this month's budget: $7,500.00.");
     expect(facts).toContain("Current logging streak: 3 day(s).");
-    expect(facts).toContain("Spent this month so far: \u20B92,500.00.");
+    expect(facts).toContain("Spent this month so far: $2,500.00.");
   });
 
   it("ignores expenses from other months", () => {
@@ -38,13 +38,13 @@ describe("buildBudgetFacts", () => {
 
   it("describes an over-budget purchase in the category that was guessed from the message", () => {
     const facts = buildBudgetFacts(stateWith(), "sneakers for 4666", TODAY);
-    expect(facts.join("\n")).toContain("considering a \u20B94,666.00 purchase in Shopping");
+    expect(facts.join("\n")).toContain("considering a $4,666.00 purchase in Shopping");
     expect(facts.join("\n")).toContain("would go over the category budget");
   });
 
   it("uses the largest number in the message as the price", () => {
     const facts = buildBudgetFacts(stateWith(), "2 coffees for 900", TODAY);
-    expect(facts.join("\n")).toContain("\u20B9900.00 purchase in Coffee");
+    expect(facts.join("\n")).toContain("$900.00 purchase in Coffee");
   });
 
   it("flags a purchase that would overspend the monthly budget", () => {

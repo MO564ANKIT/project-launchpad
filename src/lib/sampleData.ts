@@ -16,24 +16,24 @@ export const SAMPLE_CATEGORY_BUDGETS: Partial<Record<Category, number>> = {
 
 interface SampleEntry {
   daysAgo: number;
-  rupees: number;
+  dollars: number;
   category: Category;
   description: string;
 }
 
 const SAMPLE_ENTRIES: SampleEntry[] = [
-  { daysAgo: 0, rupees: 349, category: "coffee", description: "Cold brew at the corner cafe" },
-  { daysAgo: 0, rupees: 689, category: "food", description: "Late-night burrito bowl" },
-  { daysAgo: 1, rupees: 199, category: "subscriptions", description: "Music streaming" },
-  { daysAgo: 1, rupees: 1299, category: "shopping", description: 'Sneakers that were "on sale"' },
-  { daysAgo: 2, rupees: 150, category: "coffee", description: "Second latte of the week" },
-  { daysAgo: 3, rupees: 4200, category: "bills", description: "Electricity bill" },
-  { daysAgo: 4, rupees: 649, category: "subscriptions", description: "Video streaming" },
-  { daysAgo: 5, rupees: 1850, category: "food", description: "Friends dinner" },
-  { daysAgo: 6, rupees: 599, category: "fun", description: "Arcade night" },
-  { daysAgo: 8, rupees: 2200, category: "shopping", description: "Kitchen gadgets" },
-  { daysAgo: 10, rupees: 1800, category: "health", description: "Gym membership" },
-  { daysAgo: 12, rupees: 620, category: "transport", description: "Metro pass top-up" },
+  { daysAgo: 0, dollars: 349, category: "coffee", description: "Cold brew at the corner cafe" },
+  { daysAgo: 0, dollars: 689, category: "food", description: "Late-night burrito bowl" },
+  { daysAgo: 1, dollars: 199, category: "subscriptions", description: "Music streaming" },
+  { daysAgo: 1, dollars: 1299, category: "shopping", description: 'Sneakers that were "on sale"' },
+  { daysAgo: 2, dollars: 150, category: "coffee", description: "Second latte of the week" },
+  { daysAgo: 3, dollars: 4200, category: "bills", description: "Electricity bill" },
+  { daysAgo: 4, dollars: 649, category: "subscriptions", description: "Video streaming" },
+  { daysAgo: 5, dollars: 1850, category: "food", description: "Friends dinner" },
+  { daysAgo: 6, dollars: 599, category: "fun", description: "Arcade night" },
+  { daysAgo: 8, dollars: 2200, category: "shopping", description: "Kitchen gadgets" },
+  { daysAgo: 10, dollars: 1800, category: "health", description: "Gym membership" },
+  { daysAgo: 12, dollars: 620, category: "transport", description: "Metro pass top-up" },
 ];
 
 const STORAGE_SAMPLE_PREFIX = "Sample: ";
@@ -72,7 +72,7 @@ export function createDemoState(now: Date): GameState {
   const at = now.toISOString();
   const expenses: Expense[] = SAMPLE_ENTRIES.map((entry, index) => ({
     id: `sample-${index + 1}`,
-    amountPaise: entry.rupees * 100,
+    amountPaise: entry.dollars * 100,
     category: entry.category,
     date: dateInCurrentMonth(now, entry.daysAgo),
     description: `${STORAGE_SAMPLE_PREFIX}${entry.description}`,

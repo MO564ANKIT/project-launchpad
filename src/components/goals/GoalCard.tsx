@@ -1,3 +1,4 @@
+import { WithdrawSavings } from "@/components/goals/WithdrawSavings";
 import { useState } from "react";
 import { CalendarDays, Check, Lock, Trash2, Trophy } from "lucide-react";
 import { Button } from "@/components/kit/Button";
@@ -80,7 +81,7 @@ export function GoalCard({ goal, rewards, contributions, tourTarget }: GoalCardP
     setBusy(true);
     setError(null);
     try {
-      const { approveUrl } = await createGoalContribution(goal.id, amount);
+      const { approveUrl } = await createGoalContribution(goal.id, amount, goal.is_demo);
       window.location.assign(approveUrl);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not start PayPal. Please try again.");
@@ -201,7 +202,7 @@ export function GoalCard({ goal, rewards, contributions, tourTarget }: GoalCardP
       {complete ? (
         <div className="flex items-center gap-3 rounded-2xl border border-amber-400/40 bg-amber-500/10 p-4 text-sm text-amber-200">
           <Trophy className="h-6 w-6 shrink-0" /> Legendary goal complete. Every contribution here
-          was verified with PayPal Sandbox.
+          uses sandbox test funds. Demo rows are simulated.
         </div>
       ) : (
         <div className="space-y-3">
@@ -233,23 +234,29 @@ export function GoalCard({ goal, rewards, contributions, tourTarget }: GoalCardP
           <Button
             variant="primary"
             className="w-full"
-            disabled={!amount || busy || checkoutPaused}
+            disabled={!amount || busy || (checkoutPaused && !goal.is_demo)}
             onClick={contribute}
             data-tour={tourTarget ? "contribute" : undefined}
           >
-            {checkoutPaused
-              ? "Sandbox setup needed"
-              : busy
-                ? "Opening PayPal Sandbox..."
-                : `Contribute ${amount ? formatUsdCents(amount) : ""} with PayPal`}
+            {goal.is_demo
+              ? busy
+                ? "Opening simulated checkout…"
+                : "Simulated checkout"
+              : checkoutPaused
+                ? "Sandbox setup needed"
+                : busy
+                  ? "Opening PayPal Sandbox..."
+                  : `Contribute ${amount ? formatUsdCents(amount) : ""} with PayPal`}
           </Button>
           <TestModeNote />
           <p className="text-xs text-ink-400">
-            Simulated contribution: a PayPal Sandbox merchant payment. Spendemon does not hold or
-            store your money.
+            Spendemon Savings Vault holds sandbox test funds in its PayPal merchant account. Demo
+            contributions are simulated; no real money is stored.
           </p>
         </div>
       )}
+
+      {complete && <WithdrawSavings goalId={goal.id} />}
 
       <section>
         <h4 className="text-sm font-bold text-ink-100">Contribution history</h4>

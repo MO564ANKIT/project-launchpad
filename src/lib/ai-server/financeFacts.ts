@@ -2,8 +2,6 @@
 // All numbers shown to users or sent to the AI come from here, never from the model.
 import type { SavedBudgetState } from "../roast-server/budgetFacts";
 
-/** Fixed reference rate used only to compare US-dollar sandbox prices with rupee budgets. */
-export const USD_INR_REFERENCE_RATE = 83;
 /** Marketplace cosmetics count against this budget category. */
 export const MARKETPLACE_CATEGORY = "fun";
 
@@ -25,7 +23,7 @@ export function categoryLabel(category: string): string {
 }
 
 export function usdCentsToPaise(cents: number): number {
-  return Math.round(cents * USD_INR_REFERENCE_RATE);
+  return cents;
 }
 
 function round1(value: number): number {
@@ -36,7 +34,7 @@ export type GuardianVerdict = "no-budget" | "over" | "tight" | "fits";
 
 export interface GuardianFacts {
   priceUsdCents: number;
-  priceInrPaise: number;
+  priceBudgetCents: number;
   categoryLabel: string;
   categoryBudgetPaise: number | null;
   categoryRemainingPaise: number | null;
@@ -65,7 +63,7 @@ export function computeGuardianFacts(
   priceUsdCents: number,
   today: string,
 ): GuardianFacts {
-  const priceInrPaise = usdCentsToPaise(priceUsdCents);
+  const priceBudgetCents = usdCentsToPaise(priceUsdCents);
   const spend = monthSpend(state, today);
   const categoryBudget = state.categoryBudgetsPaise[MARKETPLACE_CATEGORY] ?? null;
   const categoryRemaining =
@@ -74,20 +72,24 @@ export function computeGuardianFacts(
     state.monthlyBudgetPaise === null ? null : state.monthlyBudgetPaise - spend.total;
 
   const share = (remaining: number | null) =>
-    remaining === null ? null : remaining <= 0 ? null : round1((priceInrPaise / remaining) * 100);
+    remaining === null
+      ? null
+      : remaining <= 0
+        ? null
+        : round1((priceBudgetCents / remaining) * 100);
 
   const remainingValues = [categoryRemaining, monthlyRemaining].filter(
     (value): value is number => value !== null,
   );
   let verdict: GuardianVerdict;
   if (remainingValues.length === 0) verdict = "no-budget";
-  else if (remainingValues.some((value) => priceInrPaise > value)) verdict = "over";
-  else if (remainingValues.some((value) => priceInrPaise > value * 0.5)) verdict = "tight";
+  else if (remainingValues.some((value) => priceBudgetCents > value)) verdict = "over";
+  else if (remainingValues.some((value) => priceBudgetCents > value * 0.5)) verdict = "tight";
   else verdict = "fits";
 
   return {
     priceUsdCents,
-    priceInrPaise,
+    priceBudgetCents,
     categoryLabel: categoryLabel(MARKETPLACE_CATEGORY),
     categoryBudgetPaise: categoryBudget,
     categoryRemainingPaise: categoryRemaining,
@@ -99,16 +101,17 @@ export function computeGuardianFacts(
   };
 }
 
-const inr = new Intl.NumberFormat("en-IN", {
+const usd = new Intl.NumberFormat("en-US", {
   style: "currency",
-  currency: "INR",
-  maximumFractionDigits: 0,
+  currency: "USD",
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
 });
-export const formatPaise = (paise: number) => inr.format(paise / 100);
+export const formatPaise = (paise: number) => usd.format(paise / 100);
 
 export function guardianFactLines(facts: GuardianFacts): string[] {
   const lines = [
-    `Purchase price: US$${(facts.priceUsdCents / 100).toFixed(2)} (about ${formatPaise(facts.priceInrPaise)} at a fixed reference rate of ₹${USD_INR_REFERENCE_RATE} per US$).`,
+    `Purchase price: US$${(facts.priceUsdCents / 100).toFixed(2)}. All budget figures are USD.`,
   ];
   if (facts.categoryRemainingPaise === null) lines.push(`No ${facts.categoryLabel} budget is set.`);
   else if (facts.categoryRemainingPaise <= 0)
@@ -127,7 +130,7 @@ export function guardianFactLines(facts: GuardianFacts): string[] {
 }
 
 export function guardianFallbackText(facts: GuardianFacts): string {
-  const price = formatPaise(facts.priceInrPaise);
+  const price = formatPaise(facts.priceBudgetCents);
   if (facts.verdict === "no-budget") {
     return `This costs about ${price}. You have not set a ${facts.categoryLabel} or monthly budget yet, so I cannot compare it with your plan. Setting one in Spend makes this check much more useful.`;
   }

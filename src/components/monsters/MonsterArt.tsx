@@ -153,7 +153,7 @@ function Napcoin({ color }: DrawingProps) {
         fill="#8a5a00"
         fontFamily="Space Grotesk, sans-serif"
       >
-        ₹
+        $
       </text>
       <path
         d="M38 58 Q44 64 50 58 M70 58 Q76 64 82 58"

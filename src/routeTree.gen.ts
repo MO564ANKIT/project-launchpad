@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ExpensesRouteImport } from './routes/expenses'
 import { Route as GoalsRouteImport } from './routes/goals'
+import { Route as JudgesRouteImport } from './routes/judges'
 import { Route as LootShopRouteImport } from './routes/loot-shop'
 import { Route as MoneyLabRouteImport } from './routes/money-lab'
 import { Route as MonstersRouteImport } from './routes/monsters'
@@ -35,6 +36,11 @@ const ExpensesRoute = ExpensesRouteImport.update({
 const GoalsRoute = GoalsRouteImport.update({
   id: '/goals',
   path: '/goals',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JudgesRoute = JudgesRouteImport.update({
+  id: '/judges',
+  path: '/judges',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LootShopRoute = LootShopRouteImport.update({
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/expenses': typeof ExpensesRoute
   '/goals': typeof GoalsRoute
+  '/judges': typeof JudgesRoute
   '/loot-shop': typeof LootShopRoute
   '/money-lab': typeof MoneyLabRoute
   '/monsters': typeof MonstersRoute
@@ -101,6 +108,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/expenses': typeof ExpensesRoute
   '/goals': typeof GoalsRoute
+  '/judges': typeof JudgesRoute
   '/loot-shop': typeof LootShopRoute
   '/money-lab': typeof MoneyLabRoute
   '/monsters': typeof MonstersRoute
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/expenses': typeof ExpensesRoute
   '/goals': typeof GoalsRoute
+  '/judges': typeof JudgesRoute
   '/loot-shop': typeof LootShopRoute
   '/money-lab': typeof MoneyLabRoute
   '/monsters': typeof MonstersRoute
@@ -132,6 +141,7 @@ export interface FileRouteTypes {
     | '/'
     | '/expenses'
     | '/goals'
+    | '/judges'
     | '/loot-shop'
     | '/money-lab'
     | '/monsters'
@@ -146,6 +156,7 @@ export interface FileRouteTypes {
     | '/'
     | '/expenses'
     | '/goals'
+    | '/judges'
     | '/loot-shop'
     | '/money-lab'
     | '/monsters'
@@ -160,6 +171,7 @@ export interface FileRouteTypes {
     | '/'
     | '/expenses'
     | '/goals'
+    | '/judges'
     | '/loot-shop'
     | '/money-lab'
     | '/monsters'
@@ -175,6 +187,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ExpensesRoute: typeof ExpensesRoute
   GoalsRoute: typeof GoalsRoute
+  JudgesRoute: typeof JudgesRoute
   LootShopRoute: typeof LootShopRoute
   MoneyLabRoute: typeof MoneyLabRoute
   MonstersRoute: typeof MonstersRoute
@@ -207,6 +220,13 @@ declare module '@tanstack/react-router' {
       path: '/goals'
       fullPath: '/goals'
       preLoaderRoute: typeof GoalsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/judges': {
+      id: '/judges'
+      path: '/judges'
+      fullPath: '/judges'
+      preLoaderRoute: typeof JudgesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/loot-shop': {
@@ -279,6 +299,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ExpensesRoute: ExpensesRoute,
   GoalsRoute: GoalsRoute,
+  JudgesRoute: JudgesRoute,
   LootShopRoute: LootShopRoute,
   MoneyLabRoute: MoneyLabRoute,
   MonstersRoute: MonstersRoute,

@@ -25,9 +25,9 @@ const CATEGORY_KEYWORDS: { pattern: RegExp; category: string }[] = [
 const MAX_AMOUNT_PAISE = 1_000_000_000;
 const TIGHT_THRESHOLD_RATIO = 0.1;
 const DATE_KEY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
-const moneyFormatter = new Intl.NumberFormat("en-IN", {
+const moneyFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
-  currency: "INR",
+  currency: "USD",
   maximumFractionDigits: 2,
 });
 

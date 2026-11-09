@@ -60,14 +60,14 @@ export function BudgetForm({ state, onSave, onCancel }: BudgetFormProps) {
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-6">
       <FormField
-        label="Monthly budget (INR)"
+        label="Monthly budget (USD)"
         htmlFor="budget-monthly"
         error={errors.monthly}
         hint="Leave blank for no monthly limit. Every expense counts toward it."
       >
         <div className="relative">
           <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 font-bold text-ink-300">
-            ₹
+            $
           </span>
           <input
             id="budget-monthly"
@@ -93,7 +93,7 @@ export function BudgetForm({ state, onSave, onCancel }: BudgetFormProps) {
             >
               <div className="relative">
                 <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-ink-300">
-                  ₹
+                  $
                 </span>
                 <input
                   id={`budget-${category}`}

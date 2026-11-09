@@ -70,7 +70,7 @@ export function LootShopPage() {
 
   return (
     <div className="space-y-8">
-      <header className="space-y-2">
+      <header data-tour="marketplace" className="space-y-2">
         <div className="flex flex-wrap items-center gap-3">
           <p className="text-sm font-medium text-amber-300">Monster Marketplace</p>
           <SandboxBadge />

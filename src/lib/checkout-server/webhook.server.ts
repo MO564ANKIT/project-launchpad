@@ -1,7 +1,7 @@
 // PayPal webhook handling: signature verification via PayPal's API, event
 // deduplication, and reconciliation through the same atomic credit function.
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { PAYPAL_API, creditVerifiedOrder, getAccessToken } from "./paypal.server";
+import { paypalFetch, creditVerifiedOrder, getAccessToken } from "./paypal.server";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Db = SupabaseClient<any, any, any>;
@@ -20,8 +20,9 @@ export interface WebhookEvent {
   resource?: {
     id?: string;
     status?: string;
+    links?: { rel?: string; href?: string }[];
     amount?: { value?: string; currency_code?: string };
-    supplementary_data?: { related_ids?: { order_id?: string } };
+    supplementary_data?: { related_ids?: { order_id?: string; capture_id?: string } };
   };
 }
 
@@ -69,11 +70,16 @@ export function interpretWebhookEvent(event: WebhookEvent): WebhookAction {
       if (typeof orderId !== "string") return { kind: "ignore" };
       return { kind: "fail", orderId, reason: `PayPal reported ${event.event_type}` };
     case "PAYMENT.CAPTURE.REFUNDED":
-    case "PAYMENT.CAPTURE.REVERSED":
-      // The refunded resource links back to the capture via its "up" link; we match on capture id when present.
-      return typeof resource.id === "string"
-        ? { kind: "refund", captureId: resource.id }
-        : { kind: "ignore" };
+    case "PAYMENT.CAPTURE.REVERSED": // The refunded resource links back to the capture via its "up" link; we match on capture id when present.
+    {
+      const captureId =
+        resource.supplementary_data?.related_ids?.capture_id ??
+        resource.links
+          ?.find((link) => link.rel === "up")
+          ?.href?.match(/\/captures\/([A-Z0-9]+)(?:\?|$)/)?.[1] ??
+        (event.event_type === "PAYMENT.CAPTURE.REVERSED" ? resource.id : undefined);
+      return captureId ? { kind: "refund", captureId } : { kind: "ignore" };
+    }
     default:
       return { kind: "ignore" };
   }
@@ -86,7 +92,7 @@ export async function verifyWebhookSignature(headers: Headers, event: unknown): 
   if (values.some((value) => !value)) return false;
 
   const accessToken = await getAccessToken();
-  const response = await fetch(`${PAYPAL_API}/v1/notifications/verify-webhook-signature`, {
+  const response = await paypalFetch(`/v1/notifications/verify-webhook-signature`, {
     method: "POST",
     headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -154,15 +160,7 @@ export async function processWebhookEvent(db: Db, event: WebhookEvent): Promise<
     if (error) throw error;
     outcome = "failed";
   } else if (action.kind === "refund") {
-    const { error } = await db
-      .from("shop_orders")
-      .update({
-        status: "refunded",
-        failure_reason: "Refunded at PayPal",
-        updated_at: new Date().toISOString(),
-      })
-      .eq("paypal_capture_id", action.captureId)
-      .eq("status", "completed");
+    const { error } = await db.rpc("reverse_paypal_order", { _capture_id: action.captureId });
     if (error) throw error;
     outcome = "refund-recorded";
   }

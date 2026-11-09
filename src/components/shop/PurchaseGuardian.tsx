@@ -8,6 +8,8 @@ import { LOOT_BY_ID } from "@/lib/lootCatalogue";
 import { formatMoney, formatUsdCents } from "@/lib/money";
 import { purchaseGuardian, type GuardianResponse } from "@/lib/financeAi.functions";
 import { createPaypalOrder } from "@/lib/paypalCheckout";
+import { usePaypalSetup } from "@/lib/paypalSetup";
+import { useAuth } from "@/state/authContext";
 import { useGame } from "@/state/gameContext";
 import { cn } from "@/lib/cn";
 
@@ -33,6 +35,10 @@ export function PurchaseGuardian({
   onClose,
   onSavedForLater,
 }: PurchaseGuardianProps) {
+  const setup = usePaypalSetup();
+  const { session } = useAuth();
+  const simulated =
+    session?.user.app_metadata.judge_mode === true || setup.data?.checkoutReady === false;
   const { today, saveForLater } = useGame();
   const [result, setResult] = useState<Loaded | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -64,7 +70,7 @@ export function PurchaseGuardian({
     setPaying(true);
     setPayError(null);
     try {
-      const { approveUrl } = await createPaypalOrder(itemIds);
+      const { approveUrl } = await createPaypalOrder(itemIds, simulated);
       window.location.assign(approveUrl);
     } catch (err) {
       setPayError(err instanceof Error ? err.message : "Could not start PayPal. Please try again.");
@@ -131,7 +137,7 @@ export function PurchaseGuardian({
                 </span>
               </div>
               <dl className="mt-4 grid gap-3 sm:grid-cols-3">
-                <Fact label="Price (approx.)" value={formatMoney(result.facts.priceInrPaise)} />
+                <Fact label="Price (approx.)" value={formatMoney(result.facts.priceBudgetCents)} />
                 <Fact
                   label={`${result.facts.categoryLabel} left`}
                   value={
@@ -160,8 +166,7 @@ export function PurchaseGuardian({
                 />
               </dl>
               <p className="mt-3 text-xs text-ink-400">
-                Calculated on our server from your saved budget. US$ prices are converted at a fixed
-                reference rate of ₹83 per US$.
+                Calculated from your saved budget. Prices and budgets are all in USD.
               </p>
             </section>
 
@@ -205,7 +210,11 @@ export function PurchaseGuardian({
 
         <div className="grid gap-2 sm:grid-cols-3">
           <Button variant="primary" onClick={pay} disabled={paying}>
-            {paying ? "Opening PayPal..." : "Continue to PayPal"}
+            {paying
+              ? "Opening checkout..."
+              : simulated
+                ? "Simulated checkout"
+                : "Continue to PayPal"}
           </Button>
           <Button variant="volt" onClick={later} disabled={paying}>
             <Bookmark className="h-4 w-4" /> Save for later

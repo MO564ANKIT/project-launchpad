@@ -83,7 +83,7 @@ export function PaypalReturn() {
   useEffect(() => {
     if (!request || startedRef.current) return;
     startedRef.current = true;
-    window.history.replaceState(null, "", window.location.pathname);
+    // Keep the reference until dismissal so refresh safely recovers the same order.
 
     if (request.kind === "cancel") {
       cancelPaypalOrder(request.orderId)
@@ -108,7 +108,10 @@ export function PaypalReturn() {
   if (!outcome) return null;
 
   const close = () => {
-    if (outcome.phase !== "capturing") setOutcome(null);
+    if (outcome.phase !== "capturing") {
+      window.history.replaceState(null, "", window.location.pathname);
+      setOutcome(null);
+    }
   };
 
   const live = getLevelProgress(state.monsters.saverion.xp);
@@ -121,12 +124,19 @@ export function PaypalReturn() {
       {outcome.phase === "capturing" && (
         <div className="flex flex-col items-center gap-4 py-6 text-center" role="status">
           <Loader2 className="h-10 w-10 animate-spin text-aqua-300" />
-          <p className="text-sm text-ink-200">Verifying the capture with PayPal on our server...</p>
+          <p className="text-sm text-ink-200">Approved checkout received. Confirming payment…</p>
         </div>
       )}
 
       {outcome.phase === "completed" && (
         <div className="space-y-5">
+          <p className="text-center text-sm font-bold text-amber-300">
+            {outcome.result.simulated
+              ? "Simulated checkout · no money moved"
+              : outcome.result.alreadyCompleted
+                ? "Already completed · no duplicate credit"
+                : "PayPal Sandbox payment verified"}
+          </p>
           <div className="relative flex flex-col items-center gap-3 text-center">
             {SPARK_ANGLES.map((angle, index) => (
               <motion.span
@@ -154,8 +164,9 @@ export function PaypalReturn() {
               <CheckCircle2 className="h-12 w-12 text-neon-400" />
             </motion.div>
             <p className="text-sm text-ink-200">
-              PayPal confirmed a {formatUsdCents(outcome.result.amountCents)} sandbox payment and
-              our server verified the amount, currency and owner.
+              {outcome.result.simulated
+                ? `Demo payment of ${formatUsdCents(outcome.result.amountCents)} recorded. PayPal was not called.`
+                : `PayPal confirmed a ${formatUsdCents(outcome.result.amountCents)} sandbox payment; the amount, currency and owner were verified.`}
               {outcome.result.kind === "goal_contribution"
                 ? " Your simulated contribution now counts toward your goal."
                 : " Your items are unlocked in your inventory."}
@@ -223,13 +234,15 @@ export function PaypalReturn() {
           <p role="alert" className="text-sm text-ink-200">
             {outcome.message}
           </p>
-          <p className="text-xs text-ink-400">Nothing was unlocked or credited.</p>
+          <p className="text-xs text-ink-400">
+            Check the Vault for the latest status before starting a new order.
+          </p>
           <div className="flex flex-wrap justify-center gap-2">
             <Button variant="primary" size="sm" onClick={() => confirm(outcome.orderId)}>
               <RotateCw className="h-4 w-4" /> Retry
             </Button>
             <Button variant="ghost" size="sm" onClick={close}>
-              Start over
+              Back to checkout
             </Button>
           </div>
         </div>
@@ -263,7 +276,7 @@ export function PaypalReturn() {
             You cancelled the PayPal checkout. Nothing was charged and nothing was unlocked.
           </p>
           <Button variant="ghost" size="sm" onClick={close}>
-            Back
+            Try a new checkout
           </Button>
         </div>
       )}
