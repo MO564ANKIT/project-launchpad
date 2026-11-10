@@ -92,7 +92,7 @@
   --color-rose-500: #ff4d5e;
   --color-rose-600: #e02c44;
 
-  --font-display: "Rajdhani", system-ui, sans-serif;
+  --font-display: "Chakra Petch", "Rajdhani", system-ui, sans-serif;
   --font-sans: "Inter", system-ui, sans-serif;
 
   --shadow-glow-neon: 0 0 24px -4px rgba(184, 255, 77, 0.45);
@@ -104,6 +104,26 @@
   --animate-float: float 4s ease-in-out infinite;
   --animate-wobble: wobble 2.4s ease-in-out infinite;
   --animate-pulse-glow: pulseGlow 2.4s ease-in-out infinite;
+  --animate-shine: shine 3.2s ease-in-out infinite;
+  --animate-aurora: aurora 18s ease-in-out infinite alternate;
+
+  @keyframes shine {
+    0% {
+      transform: translateX(-120%) skewX(-20deg);
+    }
+    60%,
+    100% {
+      transform: translateX(320%) skewX(-20deg);
+    }
+  }
+  @keyframes aurora {
+    0% {
+      transform: translate3d(-4%, 0, 0) scale(1);
+    }
+    100% {
+      transform: translate3d(4%, 3%, 0) scale(1.08);
+    }
+  }
 
   @keyframes float {
     0%,
@@ -183,18 +203,42 @@
   body {
     @apply font-sans text-ink-100 antialiased;
     min-height: 100vh;
-    background-color: var(--color-night-950);
+    position: relative;
+    isolation: isolate;
+  }
+
+  /* Ambient arena backdrop: slow aurora glow plus a perspective grid that fades out. */
+  body::before,
+  body::after {
+    content: "";
+    position: fixed;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  body::before {
+    inset: -10%;
+    background:
+      radial-gradient(40% 35% at 20% 10%, rgba(139, 92, 246, 0.28), transparent 70%),
+      radial-gradient(35% 30% at 85% 5%, rgba(58, 214, 242, 0.14), transparent 70%),
+      radial-gradient(40% 35% at 70% 100%, rgba(184, 255, 77, 0.08), transparent 70%);
+    filter: blur(20px);
+    animation: var(--animate-aurora);
+  }
+
+  body::after {
+    left: -50%;
+    right: -50%;
+    bottom: 0;
+    height: 55vh;
     background-image:
-      radial-gradient(ellipse 70% 45% at 50% -8%, rgba(139, 92, 246, 0.22), transparent 70%),
-      radial-gradient(ellipse 50% 40% at 100% 100%, rgba(184, 255, 77, 0.06), transparent 70%),
-      linear-gradient(rgba(139, 92, 246, 0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(139, 92, 246, 0.05) 1px, transparent 1px);
-    background-size:
-      auto,
-      auto,
-      48px 48px,
-      48px 48px;
-    background-attachment: fixed;
+      linear-gradient(rgba(139, 92, 246, 0.22) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(139, 92, 246, 0.22) 1px, transparent 1px);
+    background-size: 64px 64px;
+    transform: perspective(600px) rotateX(62deg);
+    transform-origin: bottom center;
+    mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent 75%);
+    -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent 75%);
   }
 
   h1,
@@ -217,22 +261,39 @@
 @layer components {
   .card {
     min-width: 0;
-    @apply relative rounded-2xl border border-volt-500/25 bg-night-700/80 shadow-card backdrop-blur-sm;
-    background-image: linear-gradient(160deg, rgba(139, 92, 246, 0.1), transparent 45%);
+    @apply relative rounded-2xl border border-white/[0.07] bg-night-800/70 shadow-card backdrop-blur-md;
+    background-image:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 40%),
+      linear-gradient(150deg, rgba(139, 92, 246, 0.12), transparent 50%);
   }
 
-  .card::before,
+  /* Glowing top edge and a single HUD corner tick keep cards game-like without noise. */
+  .card::before {
+    @apply pointer-events-none absolute inset-x-8 -top-px h-px;
+    content: "";
+    background: linear-gradient(90deg, transparent, rgba(167, 139, 250, 0.7), transparent);
+  }
+
   .card::after {
-    @apply pointer-events-none absolute h-4 w-4 border-neon-400;
+    @apply pointer-events-none absolute -top-px -left-px h-5 w-5 rounded-tl-2xl border-t-2 border-l-2 border-neon-400/70;
     content: "";
   }
 
-  .card::before {
-    @apply -top-px -left-px rounded-tl-2xl border-t-2 border-l-2;
+  .hud-label {
+    @apply font-display text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-400;
   }
 
-  .card::after {
-    @apply -right-px -bottom-px rounded-br-2xl border-r-2 border-b-2;
+  .glow-text {
+    text-shadow:
+      0 0 18px rgba(184, 255, 77, 0.35),
+      0 0 2px rgba(184, 255, 77, 0.6);
+  }
+
+  .title-gradient {
+    background: linear-gradient(180deg, #ffffff 10%, var(--color-volt-300) 55%, var(--color-volt-500));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
 
   .input {

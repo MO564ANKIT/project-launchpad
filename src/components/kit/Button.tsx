@@ -6,17 +6,18 @@ type Size = "sm" | "md" | "lg";
 
 const VARIANT_CLASSES: Record<Variant, string> = {
   primary:
-    "bg-neon-500 text-night-950 font-bold shadow-[0_5px_0_0_var(--color-neon-600),0_0_24px_-4px_rgba(184,255,77,0.45)] hover:bg-neon-400 hover:shadow-[0_5px_0_0_var(--color-neon-600),0_0_32px_-4px_rgba(200,255,115,0.7)] active:translate-y-[3px] active:shadow-[0_2px_0_0_var(--color-neon-600)]",
-  volt: "bg-volt-400 text-night-950 font-bold shadow-glow-volt hover:bg-volt-300",
-  ghost: "border border-white/15 bg-white/5 text-ink-50 hover:border-white/30 hover:bg-white/10",
+    "relative overflow-hidden bg-neon-500 text-night-950 font-bold uppercase tracking-wider font-display shadow-[0_4px_0_0_var(--color-neon-600),0_0_24px_-4px_rgba(184,255,77,0.45)] hover:bg-neon-400 hover:shadow-[0_4px_0_0_var(--color-neon-600),0_0_32px_-4px_rgba(200,255,115,0.7)] active:translate-y-[3px] active:shadow-[0_1px_0_0_var(--color-neon-600)] after:pointer-events-none after:absolute after:inset-y-0 after:left-0 after:w-1/4 after:bg-white/40 after:blur-md after:animate-shine",
+  volt: "relative overflow-hidden bg-volt-400 text-night-950 font-bold uppercase tracking-wider font-display shadow-[0_4px_0_0_var(--color-volt-600),0_0_28px_-4px_rgba(139,92,246,0.55)] hover:bg-volt-300 active:translate-y-[3px] active:shadow-[0_1px_0_0_var(--color-volt-600)]",
+  ghost:
+    "border border-white/10 bg-white/[0.04] text-ink-50 hover:border-volt-400/50 hover:bg-volt-500/10",
   danger: "border border-rose-400/40 bg-rose-500/15 text-rose-300 hover:bg-rose-500/25",
   subtle: "text-ink-200 hover:bg-white/5 hover:text-ink-50",
 };
 
 const SIZE_CLASSES: Record<Size, string> = {
-  sm: "h-9 px-3 text-sm rounded-xl gap-1.5",
-  md: "h-11 px-5 text-sm rounded-2xl gap-2",
-  lg: "h-13 px-6 text-base rounded-2xl gap-2",
+  sm: "h-9 px-3 text-sm rounded-lg gap-1.5",
+  md: "h-11 px-5 text-sm rounded-xl gap-2",
+  lg: "h-13 px-6 text-base rounded-xl gap-2",
 };
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {

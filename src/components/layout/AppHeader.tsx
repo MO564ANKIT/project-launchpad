@@ -6,21 +6,21 @@ import { useAuth } from "@/state/authContext";
 import { useGame } from "@/state/gameContext";
 import type { GameState } from "@/types";
 import { computeStreak } from "@/lib/progress";
+import { getLevelProgress, getSpecies } from "@/lib/monsters";
 
 function Logo() {
   return (
-    <div className="flex items-center gap-2 sm:gap-3">
-      <div className="flex h-9 w-9 sm:h-11 sm:w-11 items-center justify-center rounded-xl border border-neon-400/50 bg-night-900 shadow-glow-neon">
-        <Flame className="h-5 w-5 text-neon-300" strokeWidth={2.25} />
+    <div className="flex items-center gap-2.5 sm:gap-3">
+      <div className="relative flex h-9 w-9 items-center justify-center sm:h-10 sm:w-10">
+        <span
+          aria-hidden="true"
+          className="absolute inset-0 rotate-45 rounded-lg border border-neon-400/60 bg-night-900 shadow-glow-neon"
+        />
+        <Flame className="relative h-5 w-5 text-neon-300" strokeWidth={2.25} />
       </div>
-      <div className="leading-none">
-        <p className="font-display text-base font-bold uppercase tracking-[0.12em] sm:text-xl sm:tracking-[0.18em] text-ink-50">
-          Spendemon
-        </p>
-        <p className="mt-1 hidden text-[11px] uppercase tracking-widest text-ink-400 sm:block">
-          Your wallet is cooked. Your monsters are thriving.
-        </p>
-      </div>
+      <p className="font-display text-base font-bold uppercase leading-none tracking-[0.14em] text-ink-50 sm:text-xl sm:tracking-[0.2em]">
+        Spend<span className="text-neon-400 glow-text">emon</span>
+      </p>
     </div>
   );
 }
@@ -34,22 +34,54 @@ export function AppHeader({ onNavigate }: AppHeaderProps) {
   const streak = computeStreak(state.events, today);
 
   return (
-    <header className="sticky top-0 z-30 border-b border-neon-400/15 bg-night-950/85 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 sm:gap-3 sm:px-4 py-3 sm:px-6">
+    <header className="sticky top-0 z-30 border-b border-white/[0.06] bg-night-950/70 backdrop-blur-xl">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 py-3 sm:gap-3 sm:px-6">
         <button
           type="button"
           onClick={() => onNavigate("dashboard")}
-          className="rounded-xl text-left transition hover:opacity-90"
+          className="rounded-xl text-left transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-400"
+          aria-label="Spendemon home"
         >
           <Logo />
         </button>
         <div className="flex items-center gap-1.5 sm:gap-2">
+          <PlayerChip state={state} />
           <StreakChip streak={streak} />
           <DataMenu state={state} />
           <SignOutButton />
         </div>
       </div>
+      <span
+        aria-hidden="true"
+        className="absolute inset-x-0 -bottom-px h-px bg-gradient-to-r from-transparent via-neon-400/40 to-transparent"
+      />
     </header>
+  );
+}
+
+function PlayerChip({ state }: { state: GameState }) {
+  const featured = getSpecies(state.featuredMonsterId);
+  const progress = getLevelProgress(state.monsters[featured.id].xp);
+  return (
+    <div
+      className="hidden items-center gap-3 rounded-lg border border-volt-400/30 bg-volt-500/10 py-1.5 pl-1.5 pr-3 md:flex"
+      title={`${featured.name} XP progress`}
+    >
+      <span className="flex h-7 min-w-7 items-center justify-center rounded-md bg-volt-500 px-1.5 font-display text-xs font-bold text-night-950">
+        {progress.level}
+      </span>
+      <div className="flex w-24 flex-col gap-1">
+        <span className="font-display text-[10px] font-semibold uppercase leading-none tracking-widest text-volt-300">
+          {progress.isMaxLevel ? "Max level" : "Level"}
+        </span>
+        <span className="h-1.5 overflow-hidden rounded-sm bg-night-950/80">
+          <span
+            className="block h-full rounded-sm bg-gradient-to-r from-volt-500 to-volt-300"
+            style={{ width: `${progress.percent}%` }}
+          />
+        </span>
+      </div>
+    </div>
   );
 }
 
@@ -58,7 +90,7 @@ function SignOutButton() {
   return (
     <Button variant="ghost" size="sm" onClick={() => void signOut()} aria-label="Sign out">
       <LogOut className="h-4 w-4" />
-      <span className="hidden sm:inline">Sign out</span>
+      <span className="hidden lg:inline">Sign out</span>
     </Button>
   );
 }
@@ -66,12 +98,14 @@ function SignOutButton() {
 function StreakChip({ streak }: { streak: number }) {
   return (
     <div
-      className="flex items-center gap-2 rounded-lg border border-amber-400/35 bg-amber-500/10 px-3 py-1.5 text-sm font-bold text-amber-300"
+      className="flex h-9 items-center gap-1.5 rounded-lg border border-amber-400/35 bg-amber-500/10 px-3 font-display text-sm font-bold text-amber-300"
       title="Consecutive days with any activity"
     >
       <Flame className={`h-4 w-4 ${streak > 0 ? "animate-pulse" : "opacity-50"}`} />
       <span>{streak}</span>
-      <span className="hidden font-medium text-amber-200/80 sm:inline">day streak</span>
+      <span className="hidden text-xs font-semibold uppercase tracking-wider text-amber-200/80 sm:inline">
+        day streak
+      </span>
     </div>
   );
 }
@@ -93,7 +127,7 @@ function DataMenu({ state }: { state: GameState }) {
     <>
       <Button variant="ghost" size="sm" onClick={() => setOpen(true)} aria-label="Data options">
         <Database className="h-4 w-4" />
-        <span className="hidden sm:inline">Data</span>
+        <span className="hidden lg:inline">Data</span>
       </Button>
       <Modal
         open={open}

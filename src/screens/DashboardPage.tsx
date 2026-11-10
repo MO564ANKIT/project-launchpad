@@ -69,12 +69,13 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
   return (
     <div className="space-y-6">
       <header className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-        <div className="flex flex-col gap-2">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-neon-400">
-            {formatMonthLabel(monthKeyOf(today))}
+        <div className="flex flex-col gap-3">
+          <p className="flex items-center gap-2 font-display text-xs font-semibold uppercase tracking-[0.24em] text-neon-400">
+            <span className="h-1.5 w-1.5 rounded-full bg-neon-400 shadow-glow-neon" aria-hidden="true" />
+            Season · {formatMonthLabel(monthKeyOf(today))}
           </p>
-          <h1 className="text-3xl font-bold text-ink-50 sm:text-4xl">
-            Your monsters are eating well.
+          <h1 className="text-balance text-4xl font-bold uppercase leading-none text-ink-50 sm:text-5xl">
+            Your monsters are <span className="text-neon-400 glow-text">eating well.</span>
           </h1>
           <p className="text-sm text-ink-300">
             {daysLeft} {daysLeft === 1 ? "day" : "days"} left this month.{" "}
@@ -86,8 +87,8 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
           </p>
         </div>
         <div className="card min-w-[240px] px-6 py-5">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-ink-400">
-            Remaining this month
+          <p className="hud-label flex items-center gap-2">
+            <Wallet className="h-3.5 w-3.5 text-amber-300" aria-hidden="true" /> Gold remaining
           </p>
           <p
             className={`mt-1.5 font-display text-4xl font-bold ${

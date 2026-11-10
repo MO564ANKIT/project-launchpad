@@ -35,16 +35,25 @@ export function ProgressBar({
       aria-valuenow={Math.round(clamped)}
       aria-label={label}
       className={cn(
-        "w-full overflow-hidden rounded-full bg-white/10",
+        "relative w-full overflow-hidden rounded-sm border border-white/[0.06] bg-night-950/80",
         height === "sm" ? "h-2" : "h-3",
         className,
       )}
     >
       <motion.div
-        className={cn("h-full rounded-full", FILL[tone])}
+        className={cn("relative h-full rounded-sm", FILL[tone])}
         initial={{ width: 0 }}
         animate={{ width: `${clamped}%` }}
         transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <span
+          aria-hidden="true"
+          className="absolute inset-x-0 top-0 h-1/2 bg-white/25"
+        />
+      </motion.div>
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[repeating-linear-gradient(90deg,transparent_0,transparent_10%,rgba(11,8,20,0.55)_10%,rgba(11,8,20,0.55)_calc(10%+2px))]"
       />
     </div>
   );
