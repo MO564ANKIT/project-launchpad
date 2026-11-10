@@ -8,6 +8,7 @@ import { LOOT_BY_ID } from "@/lib/lootCatalogue";
 import { formatMoney, formatUsdCents } from "@/lib/money";
 import { purchaseGuardian, type GuardianResponse } from "@/lib/financeAi.functions";
 import { createPaypalOrder } from "@/lib/paypalCheckout";
+import { guardianUsesSimulation } from "@/lib/checkoutRouting";
 import { usePaypalSetup } from "@/lib/paypalSetup";
 import { useAuth } from "@/state/authContext";
 import { useGame } from "@/state/gameContext";
@@ -37,8 +38,10 @@ export function PurchaseGuardian({
 }: PurchaseGuardianProps) {
   const setup = usePaypalSetup();
   const { session } = useAuth();
-  const simulated =
-    session?.user.app_metadata.judge_mode === true || setup.data?.checkoutReady === false;
+  const simulated = guardianUsesSimulation({
+    judgeMode: session?.user.app_metadata.judge_mode === true,
+    checkoutReady: setup.data?.checkoutReady,
+  });
   const { today, saveForLater } = useGame();
   const [result, setResult] = useState<Loaded | null>(null);
   const [error, setError] = useState<string | null>(null);
