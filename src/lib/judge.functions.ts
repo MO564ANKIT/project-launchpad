@@ -18,13 +18,11 @@ export const enterJudgeMode = createServerFn({ method: "POST" }).handler(async (
     throw new Error("Judge mode could not start. Please try again.");
   const userId = created.data.user.id;
   try {
-    const { error: saveError } = await supabaseAdmin
-      .from("player_saves")
-      .insert({
-        user_id: userId,
-        state: JSON.parse(JSON.stringify(createDemoState(new Date()))),
-        version: 1,
-      });
+    const { error: saveError } = await supabaseAdmin.from("player_saves").insert({
+      user_id: userId,
+      state: JSON.parse(JSON.stringify(createDemoState(new Date()))),
+      version: 1,
+    });
     if (saveError) throw saveError;
     const { error: demoError } = await supabaseAdmin.rpc("start_demo_journey", {
       _user_id: userId,

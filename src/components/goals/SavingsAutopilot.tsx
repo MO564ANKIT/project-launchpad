@@ -5,12 +5,17 @@ import { Button } from "@/components/kit/Button";
 import { planSavings } from "@/lib/autopilot.functions";
 import { createGoalContribution } from "@/lib/paypalCheckout";
 import { formatUsdCents } from "@/lib/money";
+import { useAuth } from "@/state/authContext";
 export function SavingsAutopilot() {
   const planFn = useServerFn(planSavings);
   const [result, setResult] = useState<Awaited<ReturnType<typeof planSavings>> | null>(null);
   const [busy, setBusy] = useState(false);
   const [paying, setPaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { session } = useAuth();
+  // Demo goals and judge accounts always go through the clearly labelled simulated checkout.
+  const simulated =
+    result?.goalIsDemo === true || session?.user.app_metadata.judge_mode === true;
   const plan = async () => {
     setBusy(true);
     setError(null);
@@ -30,6 +35,7 @@ export function SavingsAutopilot() {
       const order = await createGoalContribution(
         result.plan.goalId,
         result.plan.suggestedAmountCents,
+        simulated,
       );
       window.location.assign(order.approveUrl);
     } catch (e) {
@@ -61,8 +67,17 @@ export function SavingsAutopilot() {
             {formatUsdCents(result.plan.alternativeAmountCents)}
           </p>
           <Button className="w-full whitespace-normal" disabled={paying} onClick={pay}>
-            {paying ? "Opening checkout…" : "Confirm and pay with PayPal"}
+            {paying
+              ? "Opening checkout…"
+              : simulated
+                ? "Confirm simulated payment"
+                : "Confirm and pay with PayPal"}
           </Button>
+          {simulated && (
+            <p className="text-xs text-ink-400">
+              Simulated checkout: no PayPal order is created and no money moves.
+            </p>
+          )}
         </article>
       )}
       {result?.message && (

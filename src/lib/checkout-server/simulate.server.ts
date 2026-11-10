@@ -80,20 +80,18 @@ export async function simulateCheckout(
       };
   }
   const orderId = `DEMO${crypto.randomUUID().replaceAll("-", "").slice(0, 20).toUpperCase()}`;
-  const { error } = await db
-    .from("shop_orders")
-    .insert({
-      paypal_order_id: orderId,
-      user_id: userId,
-      kind: input.action === "create" ? "shop" : "goal_contribution",
-      goal_id: input.action === "contribute" ? input.goalId : null,
-      item_ids: items,
-      amount_cents: amount,
-      currency: "USD",
-      status: "created",
-      is_demo: true,
-      failure_reason: "Simulated checkout; no money moved",
-    });
+  const { error } = await db.from("shop_orders").insert({
+    paypal_order_id: orderId,
+    user_id: userId,
+    kind: input.action === "create" ? "shop" : "goal_contribution",
+    goal_id: input.action === "contribute" ? input.goalId : null,
+    item_ids: items,
+    amount_cents: amount,
+    currency: "USD",
+    status: "created",
+    is_demo: true,
+    failure_reason: "Simulated checkout; no money moved",
+  });
   if (error) throw error;
   const path = input.action === "create" ? "/loot-shop" : "/goals";
   return {

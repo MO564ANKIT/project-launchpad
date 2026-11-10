@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequestHeader, getRequestUrl } from "@tanstack/react-start/server";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { serverUsesSimulation } from "@/lib/checkoutRouting";
 
 export type CheckoutAction = "create" | "contribute" | "capture" | "cancel";
 
@@ -63,9 +64,11 @@ export const paypalCheckout = createServerFn({ method: "POST" })
       const checkout = await import("./checkout-server/paypal.server");
       const judge = context.claims.app_metadata?.judge_mode === true;
       if (
-        data.simulated ||
-        judge ||
-        (typeof data.orderId === "string" && data.orderId.startsWith("DEMO"))
+        serverUsesSimulation({
+          requestedSimulation: data.simulated,
+          judgeMode: judge,
+          orderId: data.orderId,
+        })
       ) {
         const { simulateCheckout } = await import("./checkout-server/simulate.server");
         return await simulateCheckout(supabaseAdmin, context.userId, data);
