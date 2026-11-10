@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequestHeader, getRequestUrl } from "@tanstack/react-start/server";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { serverUsesSimulation } from "@/lib/checkoutRouting";
 
 export type CheckoutAction = "create" | "contribute" | "capture" | "cancel";
 
