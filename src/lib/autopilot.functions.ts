@@ -39,6 +39,7 @@ export const planSavings = createServerFn({ method: "POST" })
     if (!fallback)
       return {
         plan: null,
+        goalIsDemo: false,
         source: "fallback" as const,
         message:
           "Set a monthly budget with at least $1.00 remaining and create an active goal first.",
@@ -63,8 +64,16 @@ export const planSavings = createServerFn({ method: "POST" })
         /* invalid JSON uses deterministic calculation */
       }
     }
+    const chosen = plan ?? fallback;
+    const { data: chosenGoal } = await context.supabase
+      .from("savings_goals")
+      .select("is_demo")
+      .eq("id", chosen.goalId)
+      .eq("user_id", context.userId)
+      .maybeSingle();
     return {
-      plan: plan ?? fallback,
+      plan: chosen,
+      goalIsDemo: chosenGoal?.is_demo === true,
       source: plan ? ("ai" as const) : ("fallback" as const),
       message: null,
     };
