@@ -37,3 +37,4 @@ use the editor.
 - Loot Shop prices are authoritative only in the server catalogue (`checkout-server/paypal.server.ts`); the display catalogue must match it (enforced by a test). Why: the browser never decides what is charged.
 - Migrated UI primitives live in `src/components/kit/`, separate from shadcn `src/components/ui/`. Why: avoids case-only file-name clashes (Button.tsx vs button.tsx).
 - `tsconfig.json` disables `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes` and `noPropertyAccessFromIndexSignature`. Why: the migrated code was written under plain `strict` mode.
+- Never call auth sign-in methods on the shared `supabaseAdmin` client; use a throwaway publishable-key client. Why: signing in replaces the admin client's service-role identity for later requests in the same worker.

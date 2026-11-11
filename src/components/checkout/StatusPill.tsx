@@ -15,8 +15,19 @@ export const STATUS_LABEL: Record<OrderStatus, string> = Object.fromEntries(
   Object.entries(STATUS).map(([key, value]) => [key, value.label]),
 ) as Record<OrderStatus, string>;
 
-export function StatusPill({ status, className }: { status: OrderStatus; className?: string }) {
-  const meta = STATUS[status] ?? STATUS.created;
+const SIMULATED = { label: "Simulated", className: "bg-amber-500/15 text-amber-300" };
+
+/** Demo rows never claim PayPal verification: a completed demo row reads "Simulated". */
+export function StatusPill({
+  status,
+  simulated = false,
+  className,
+}: {
+  status: OrderStatus;
+  simulated?: boolean;
+  className?: string;
+}) {
+  const meta = simulated && status === "completed" ? SIMULATED : (STATUS[status] ?? STATUS.created);
   return (
     <span
       className={cn(

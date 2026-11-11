@@ -28,7 +28,16 @@ export const enterJudgeMode = createServerFn({ method: "POST" }).handler(async (
       _user_id: userId,
     });
     if (demoError) throw demoError;
-    const signed = await supabaseAdmin.auth.signInWithPassword({ email, password });
+    // Sign in on a throwaway client: signing in on the shared admin client would
+    // replace its service-role identity with the judge's for later requests.
+    const { createClient } = await import("@supabase/supabase-js");
+    const url = process.env.SUPABASE_URL;
+    const key = process.env.SUPABASE_PUBLISHABLE_KEY;
+    if (!url || !key) throw new Error("Backend settings missing.");
+    const authClient = createClient(url, key, {
+      auth: { persistSession: false, autoRefreshToken: false, storage: undefined },
+    });
+    const signed = await authClient.auth.signInWithPassword({ email, password });
     if (signed.error || !signed.data.session) throw new Error("Could not sign in to judge mode.");
     return {
       access_token: signed.data.session.access_token,

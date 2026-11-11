@@ -14,8 +14,7 @@ export function SavingsAutopilot() {
   const [error, setError] = useState<string | null>(null);
   const { session } = useAuth();
   // Demo goals and judge accounts always go through the clearly labelled simulated checkout.
-  const simulated =
-    result?.goalIsDemo === true || session?.user.app_metadata.judge_mode === true;
+  const simulated = result?.goalIsDemo === true || session?.user.app_metadata.judge_mode === true;
   const plan = async () => {
     setBusy(true);
     setError(null);

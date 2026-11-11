@@ -117,7 +117,7 @@ export function PaypalReturn() {
   const live = getLevelProgress(state.monsters.saverion.xp);
 
   return (
-    <Modal open onClose={close} title={modalTitle(outcome.phase)}>
+    <Modal open onClose={close} title={modalTitle(outcome)}>
       <div className="mb-4 flex justify-center">
         <SandboxBadge />
       </div>
@@ -220,7 +220,8 @@ export function PaypalReturn() {
             </ul>
           )}
           <p className="break-all text-xs text-ink-400">
-            PayPal order reference: {outcome.result.orderId}
+            {outcome.result.simulated ? "Demo reference" : "PayPal order reference"}:{" "}
+            {outcome.result.orderId}
           </p>
           <Button variant="primary" className="w-full" onClick={close}>
             Keep going
@@ -284,12 +285,12 @@ export function PaypalReturn() {
   );
 }
 
-function modalTitle(phase: Outcome["phase"]): string {
-  switch (phase) {
+function modalTitle(outcome: Outcome): string {
+  switch (outcome.phase) {
     case "capturing":
       return "Checking your payment";
     case "completed":
-      return "Payment verified";
+      return outcome.result.simulated ? "Simulated payment recorded" : "Payment verified";
     case "failed":
       return "Payment not completed";
     case "pending":

@@ -177,14 +177,18 @@ export function VaultPage() {
                   <div className="min-w-0">
                     <p className="truncate font-semibold text-ink-50">{describe(tx)}</p>
                     <p className="text-xs text-ink-400">
-                      {tx.kind === "goal_contribution" ? "Goal contribution" : "Marketplace"} ·{" "}
-                      {formatDateTime(tx.created_at)}
+                      {tx.kind === "goal_contribution"
+                        ? "Goal contribution"
+                        : tx.kind === "payout"
+                          ? "Withdrawal"
+                          : "Marketplace"}{" "}
+                      · {formatDateTime(tx.created_at)}
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <StatusPill status={tx.status} />
-                    {tx.is_demo && (
-                      <span className="text-xs font-bold text-amber-300">Simulated</span>
+                    <StatusPill status={tx.status} simulated={tx.is_demo} />
+                    {tx.is_demo && tx.status !== "completed" && (
+                      <span className="text-xs font-bold text-amber-300">Demo</span>
                     )}
                     <span className="font-display text-lg font-bold text-ink-50">
                       {formatUsdCents(tx.amount_cents)}
@@ -207,7 +211,10 @@ export function VaultPage() {
           <div className="space-y-6">
             <dl className="grid gap-3 text-sm sm:grid-cols-2">
               <Detail label="What" value={describe(selected)} wide />
-              <Detail label="Status" value={<StatusPill status={selected.status} />} />
+              <Detail
+                label="Status"
+                value={<StatusPill status={selected.status} simulated={selected.is_demo} />}
+              />
               <Detail
                 label="Amount"
                 value={`${formatUsdCents(selected.amount_cents)} ${selected.currency}`}

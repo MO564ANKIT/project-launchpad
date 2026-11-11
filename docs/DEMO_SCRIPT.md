@@ -1,34 +1,36 @@
 # Spendemon demo script (about 5 minutes)
 
-Use a phone-sized window or a desktop window; both work down to 360px wide.
+Works on desktop and on phones down to 360px wide.
 
-## 0. Before you start
-- Sign in with a confirmed test account.
-- If PayPal Sandbox keys are not set, the "Sandbox setup needed" notice will appear on Goals and the Marketplace. Say so and lean on demo mode.
+## 0. Before you start (owner only)
+- Open `/judges` and confirm the self-test is green. If a line is red, it names the setting to add.
+- If PayPal is not ready, say so and use judge mode: everything goes through the labelled simulated checkout.
 
-## 1. First-run tour (30s)
-- On first sign-in the guided tour opens. Click **Next** through its five steps: it moves through Dashboard, Expenses, Goals and the Marketplace.
-- To replay it, clear the site's local storage, or use a new account.
+## 1. Judge entry and spotlight tour (40s)
+- On the sign-in screen press **Try as a judge**. A fresh, isolated account opens with demo data.
+- The spotlight tour highlights the real elements: savings total, demo buttons, the Autopilot and the Marketplace. Click **Next** through it or **Skip tour**.
 
-## 2. Dashboard (45s)
+## 2. Dashboard (40s)
 - Point out "Remaining this month", the streak row and the daily quests.
-- In **PayPal savings quest**, show **Total saved via PayPal**: only verified, non-demo contributions count.
-- Press **Start demo**. A demo goal ("Demo: Wireless headphones", $20 of $50) and a verified demo payment appear. The total stays honest: demo money is listed separately.
+- **Total saved via PayPal** counts verified payments only; demo money is listed separately.
 
-## 3. Goals (60s)
-- Open **Goals**: progress ring, countdown and milestone markers (25/50/75/100%).
-- Finished goals are listed under **Completed goals**.
-- With Sandbox keys set: contribute, approve on PayPal Sandbox, and come back. The server verifies the capture, then the milestone celebration plays.
+## 3. Savings Autopilot (75s)
+- Open **Goals** and press **Plan my savings**.
+- The card shows the amount, the reason, the risk and a lower alternative, labelled **AI explanation** or **Calculated fallback**.
+- Explain: the server checks the plan against the goal and the budget, and the AI cannot pay on its own.
+- Press **Confirm simulated payment**. The result screen reads "Simulated checkout · no money moved", and milestones are celebrated.
+- With real Sandbox keys and a normal account, the same button reads **Confirm and pay with PayPal** and opens PayPal Sandbox.
 
-## 4. Marketplace and Purchase Guardian (60s)
-- Open **Marketplace** and choose an item.
-- The Guardian shows facts calculated on the server from your budget, plus advice labelled **AI explanation** or **Calculated fallback**.
-- Note that **Continue to PayPal** works straight away and does not wait for the AI. The **Test mode** note confirms no real money is used.
-- Show **Save for later** as the mindful option.
+## 4. Completed goals and withdrawal (30s)
+- Scroll to **Completed goals**. Show **Withdraw savings**: one payout per goal, simulated for demo goals.
 
-## 5. Vault (45s)
-- Open **Vault**. Filter by **Last 7 days**, then tap the demo payment.
-- The side panel shows the IDs and a **status timeline**: Order started, Approved on PayPal, Verified by server.
+## 5. Marketplace and Purchase Guardian (45s)
+- Open **Marketplace** and choose an item. The Guardian shows facts calculated on the server plus labelled advice.
+- **Simulated checkout** (judge) or **Continue to PayPal** (real) works straight away and never waits for the AI.
 
-## 6. Wrap up (15s)
-- Back on the dashboard, press **Reset demo**. All demo rows disappear, and only your own account was touched.
+## 6. Vault (40s)
+- Open **Vault**, filter by **Last 7 days**, and tap the payment you just made.
+- The side panel shows its references and the status timeline. A refunded payment shows a **Refunded** step.
+
+## 7. Wrap up (10s)
+- Back on the dashboard, press **Reset demo**. Only this judge account is touched.

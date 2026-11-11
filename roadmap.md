@@ -1,13 +1,14 @@
 # Spendemon roadmap
 
-## Hackathon readiness checklist (in progress)
-- [ ] Signed-in PayPal self-test, return-state recovery, capture/webhook/credit tests
-- [ ] Idempotent refund reversal and Vault timeline
-- [ ] Savings Autopilot with validated proposals, deterministic fallback, shared AI generation
-- [ ] Spendemon Savings Vault story and idempotent sandbox withdrawals
-- [ ] USD formatting throughout without changing stored integers
-- [ ] Judge entry, spotlight tour, clearly simulated checkout
-- [ ] Secret hygiene, route/Guardian tests, documentation and verification at 360px
+## Hackathon readiness checklist (done)
+- [x] PayPal self-test page (/judges), clearer return states, capture/webhook/credit tests
+- [x] Refunds reverse value once (milestone rewards kept) and show in the Vault timeline
+- [x] Savings Autopilot: checked AI proposals, calculated fallback, one shared AI path
+- [x] Spendemon Savings Vault story; one-per-goal withdrawals, labelled Simulated payout when unavailable
+- [x] USD everywhere; stored amounts unchanged
+- [x] Judge entry (isolated throwaway account), spotlight tour, labelled simulated checkout
+- [x] Demo payments always read "Simulated", never "Verified"
+- [x] .env ignored + .env.example, routing/Guardian/every-page tests, README pitch, demo script, 360px check
 
 ## Phase 1 — "Pay. Save. Evolve." upgrade (done)
 - [x] Answer: where to see the preview
@@ -33,8 +34,8 @@
 - [x] Mobile: every page checked at 360px, no sideways scrolling (header, streak row, cards fixed)
 
 ## Honest status / not done yet
-- [ ] PayPal Sandbox checkout untested end to end: needs PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET, PAYPAL_WEBHOOK_ID
-- [ ] Live AI answers untested: needs GEMINI_API_KEY (calculated fallback works today)
-- [ ] Existing players and records from the old app not imported yet (waiting on exports)
-- [ ] The guided tour is a step-by-step card; it does not yet highlight on-screen elements
-- [ ] Lint shows 7 harmless warnings in shared UI files
+- [ ] Real PayPal Sandbox checkout not tried end to end yet: PayPal is connected, but the webhook ID and webhook registration are still needed
+- [ ] Real Sandbox Payouts not tried (falls back to a labelled Simulated payout)
+- [ ] App owner account not set, so nobody sees the "Sandbox setup needed" notice yet
+- [ ] Existing players and records from the old app not imported (waiting on exports)
+- [ ] README needs the live URL and demo video link

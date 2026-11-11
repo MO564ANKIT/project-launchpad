@@ -229,7 +229,7 @@ export function SavingsOverview({ onNavigate }: { onNavigate: (page: PageId) => 
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <StatusPill status={tx.status} />
+                  <StatusPill status={tx.status} simulated={tx.is_demo} />
                   <span className="font-bold text-ink-50">{formatUsdCents(tx.amount_cents)}</span>
                 </div>
               </li>

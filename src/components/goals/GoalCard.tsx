@@ -269,7 +269,7 @@ export function GoalCard({ goal, rewards, contributions, tourTarget }: GoalCardP
                 <span className="text-ink-300">
                   {new Date(tx.created_at).toLocaleDateString("en-IN", { dateStyle: "medium" })}
                 </span>
-                <StatusPill status={tx.status} />
+                <StatusPill status={tx.status} simulated={tx.is_demo} />
                 <span className="font-semibold text-ink-50">{formatUsdCents(tx.amount_cents)}</span>
               </li>
             ))}
