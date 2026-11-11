@@ -28,7 +28,7 @@ Spendemon is a budgeting game. You log spending, stay under budget and your mons
 1. TanStack Start (React 19) app with server functions; Tailwind CSS v4 for styling.
 2. Lovable Cloud database and auth; each player's game state is one row, saved with a version check.
 3. All payment and AI work runs in server functions that require a signed-in player; secrets never reach the browser.
-4. PayPal calls go through the Lovable connector gateway; webhooks land on `/api/public/paypal/webhook` and are signature-checked.
+4. PayPal calls go through the Lovable connector gateway; webhooks land on `/api/public/paypal-webhook` and are signature-checked.
 5. Credits, refunds and payouts are database functions that only the server can call, so they are atomic and run once.
 
 ## For judges: 3-minute tour
