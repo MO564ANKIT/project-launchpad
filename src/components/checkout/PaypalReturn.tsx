@@ -274,7 +274,11 @@ export function PaypalReturn() {
         <div className="flex flex-col items-center gap-4 text-center">
           <Undo2 className="h-12 w-12 text-amber-300" />
           <p className="text-sm text-ink-200">
-            You cancelled the PayPal checkout. Nothing was charged and nothing was unlocked.
+            The PayPal checkout was cancelled. Nothing was charged and nothing was unlocked.
+          </p>
+          <p className="text-xs text-ink-300">
+            If PayPal said the merchant does not accept your currency, the PayPal sandbox business
+            account must be allowed to receive US dollars (USD). Spendemon always charges in USD.
           </p>
           <Button variant="ghost" size="sm" onClick={close}>
             Try a new checkout
