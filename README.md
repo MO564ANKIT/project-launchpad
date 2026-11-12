@@ -183,4 +183,4 @@ REPLACE-WITH-YOUR-NAME · [@MO564ANKIT](https://github.com/MO564ANKIT)
 
 ## License
 
-MIT. See the `LICENSE` file. *(Add a `LICENSE` file to the repo, or change this line to your license.)*
+MIT. See the `LICENSE` file. (project-launchpad/LICENSE)
