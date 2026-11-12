@@ -3,7 +3,7 @@
 
 > Your wallet is cooked. Your monsters are thriving.
 
-> **Live app:** [](https://launchpad-new-horizon.lovable.app) · **Demo video:** (https://youtu.be/DZxpzB83LEU?si=_Au0neE2t2Wgv68Q)
+> **Live app:** (https://launchpad-new-horizon.lovable.app) · **Demo video:** (https://youtu.be/DZxpzB83LEU?si=_Au0neE2t2Wgv68Q)
 > **Judge access:** open the live app and press **Try as a judge**. No email or password needed.
 
 Spendemon is a budgeting game. You log spending, stay under budget and your monsters level up. When you skip an impulse buy, you move that money into a savings goal with **PayPal**, and your saver monster grows with every verified payment.
