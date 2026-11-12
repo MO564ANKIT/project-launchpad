@@ -1,3 +1,4 @@
+import { openCheckout } from "@/lib/openCheckout";
 import { WithdrawSavings } from "@/components/goals/WithdrawSavings";
 import { useState } from "react";
 import { CalendarDays, Check, Lock, Trash2, Trophy } from "lucide-react";
@@ -82,7 +83,7 @@ export function GoalCard({ goal, rewards, contributions, tourTarget }: GoalCardP
     setError(null);
     try {
       const { approveUrl } = await createGoalContribution(goal.id, amount, goal.is_demo);
-      window.location.assign(approveUrl);
+      if (openCheckout(approveUrl)) setBusy(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not start PayPal. Please try again.");
       setBusy(false);

@@ -1,3 +1,4 @@
+import { openCheckout } from "@/lib/openCheckout";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Sparkles } from "lucide-react";
@@ -36,7 +37,7 @@ export function SavingsAutopilot() {
         result.plan.suggestedAmountCents,
         simulated,
       );
-      window.location.assign(order.approveUrl);
+      if (openCheckout(order.approveUrl)) setPaying(false);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not start checkout.");
       setPaying(false);

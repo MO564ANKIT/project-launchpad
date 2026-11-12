@@ -1,3 +1,4 @@
+import { openCheckout } from "@/lib/openCheckout";
 import { useEffect, useState } from "react";
 import { Bookmark, Loader2, ShieldCheck, X } from "lucide-react";
 import { Button } from "@/components/kit/Button";
@@ -74,7 +75,7 @@ export function PurchaseGuardian({
     setPayError(null);
     try {
       const { approveUrl } = await createPaypalOrder(itemIds, simulated);
-      window.location.assign(approveUrl);
+      if (openCheckout(approveUrl)) setPaying(false);
     } catch (err) {
       setPayError(err instanceof Error ? err.message : "Could not start PayPal. Please try again.");
       setPaying(false);
