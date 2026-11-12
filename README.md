@@ -51,7 +51,7 @@ Your wallet isn't something you manage. It's an ecosystem you build.
 |---|---|---|
 | ![Money Lab](docs/img/money-lab.png) | ![Marketplace](docs/img/marketplace.png) | ![Roast Chat](docs/img/roast.png) |
 
-> Add your screenshots to `docs/img/` using the file names above.
+> 
 
 ## Features
 
